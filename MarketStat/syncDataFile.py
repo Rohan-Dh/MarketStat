@@ -56,8 +56,43 @@ def assignPermission():
     except Exception as e:
         print(e)
 
+def feedCollection():
+    collections = [
+    "T-shirts",
+    "Shirts (formal/casual)",
+    "Trousers",
+    "Jeans",
+    "Shorts",
+    "Track pants",
+    "Jackets",
+    "Suits and blazers",
+    "Kurta pyjama sets",
+    "Sherwanis",
+    "Hoodies and sweatshirts",
+    "Baby rompers",
+    "T-shirts and tops",
+    "Jeans and shorts",
+    "Frocks",
+    "Skirts",
+    "Jackets",
+    "Ethnic wear for kids",
+    "Tops and blouses",
+    "T-shirts",
+    "Dresses (casual, party, gowns)",
+    "Kurtis and tunics",
+    "Sarees",
+    "Salwar suits",
+    "Leggings and jeggings",
+    "Skirts",
+    "Jeans and pants",
+    "Shrugs and jackets",
+    "Dupattas and stoles",]
+    
+    collectionObject = [Collection(cName = collection) for collection in collections]
+    Collection.objects.bulk_create(collectionObject)
 
 addUsers()
 createPermission()
 createRole()
 assignPermission()
+feedCollection()

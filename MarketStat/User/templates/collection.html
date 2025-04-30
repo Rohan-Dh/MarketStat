@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">MarketStat</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Collections</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link profile" href="#">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "user:logout"%}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<button class="add-button button" onclick="toggleForm()">ADD</button>
+<div id="popupForm" class="form-popup">
+  <form class="form-container" method="POST">
+    {% csrf_token %}
+    <h2>Add to Collection</h2>
+    <label for="collection"><b>Collection Name</b></label>
+    <select id="collection" name="collectionId" required>
+        <option value="">Select a collection</option>
+        {% for collection in collections %}
+            <option value="{{collection.collectionId}}">{{ collection.cName }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="quantity"><b>Quantity</b></label>
+    <input type="number" id="quantity" name="quantity" placeholder="Enter quantity" required>
+
+    <label for="price"><b>Price</b></label>
+    <input type="number" id="price" name="initialPrice" placeholder="Enter price" required>
+
+    <button type="submit" class="btn">Submit</button>
+    <button type="button" class="btn cancel" onclick="toggleForm()">Close</button>
+  </form>
+</div>
+{% endblock content %}
