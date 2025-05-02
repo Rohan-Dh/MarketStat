@@ -19,6 +19,9 @@ def authView(request):
         form = UserCreationForm(request.POST or None)
         if form.is_valid():
             form.save()
+            userProfile.objects.create(
+                
+            )
             return redirect("user:login")
     else:
         form = UserCreationForm()
@@ -26,11 +29,16 @@ def authView(request):
 
 @login_required
 def home(request):
-    return render(request, "home.html", {})
+    userId = request.user.id
+    try:
+        collections = UserCollection.objects.filter(uId = userId)
+    except Exception as e:
+        return render(request, "home.html", {"error": e, "userDetails": userDetails})
+    userDetails = userProfile.objects.get(userId = userId)
+    return render(request, "home.html", {"collections": collections, "userDetails": userDetails})
 
 def collection(request):
     if request.method == "POST":
-        print(request.user.id)
         data = request.POST
         form = CollectionForm(data)
         if form.is_valid():

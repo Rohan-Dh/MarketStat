@@ -25,11 +25,11 @@ def addUsers():
 def createRole():
     roles = ["user", "admin"]
     for role in roles:
-        if Role.objects.filter(rName = role).exists():
+        if Role.objects.filter(roleName = role).exists():
             print(f"{role} already exists")
             continue
         else:
-            roleObject = Role.objects.create(rName = role)
+            roleObject = Role.objects.create(roleName = role)
             print(f"Role {role} created successfully")
 
 def createPermission():
@@ -38,19 +38,19 @@ def createPermission():
         "delete-user",
     ]
     for permission in permissions:
-        if Permission.objects.filter(pName = permission).exists():
+        if Permission.objects.filter(permissionName = permission).exists():
             print(f"{permission} already exists")
             continue
         else:
-            permissionObject = Permission.objects.create(pName = permission)
+            permissionObject = Permission.objects.create(permissionName = permission)
             print(f"Permission {permission} created successfully")
 
 def assignPermission():
-    adminRole = Role.objects.get(rName = "admin")
-    userRole = Role.objects.get(rName = "user")
+    adminRole = Role.objects.get(roleName = "admin")
+    userRole = Role.objects.get(roleName = "user")
 
-    create_user = Permission.objects.get(pName = "create-user")
-    delete_user = Permission.objects.get(pName = "delete-user")
+    create_user = Permission.objects.get(permissionName = "create-user")
+    delete_user = Permission.objects.get(permissionName = "delete-user")
     try:
         adminRole.role_permission.add(*[create_user, delete_user])
     except Exception as e:
@@ -88,7 +88,7 @@ def feedCollection():
     "Shrugs and jackets",
     "Dupattas and stoles",]
     
-    collectionObject = [Collection(cName = collection) for collection in collections]
+    collectionObject = [Collection(collectionName = collection) for collection in collections]
     Collection.objects.bulk_create(collectionObject)
 
 addUsers()
