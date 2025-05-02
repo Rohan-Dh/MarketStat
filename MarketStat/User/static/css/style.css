@@ -5,7 +5,13 @@
     font-family: 'Mulish', sans-serif;
     transition: 0.3s all ease-in-out;
 }
+.bg-body-tertiary-custom{
+    background-color: rgb(89 84 234 / 45%)
+}
 
+.set-button-color {
+    background-color: #545D7A;
+}
 
 .container-center {
     height: 50%;
@@ -199,4 +205,97 @@
 .btn:hover {
     opacity: 0.9;
 }
+
 /* end form popup */
+
+
+/* card collection starts */
+.collection-card {
+    margin: 20px 0px 0px 20px;
+    height: 200px;
+    width: 240px;
+    background-color: #033d4b;
+    border: 2px solid none;
+    padding: 10px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.collection-card:hover {
+    box-shadow: 2px 2px 5px #16667e;
+}
+
+.card-top {
+    height: 110px;
+    width: 100%;
+    display: flex;
+}
+
+.image-section {
+    height: 100%;
+    width: 40%;
+    border: 2px solid none;
+    border-radius: 15px;
+    background-color: #297b8f;
+}
+
+.content-section {
+    height: 100%;
+    width: 60%;
+    padding-top: 5px;
+    padding-left: 15px;
+    color: #545D7A;
+}
+
+.card-bottom {
+    width: auto;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+/* card collection ends */
+
+
+/* sell form styling starts*/
+.sell-form {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
+    gap: 10px;
+    padding: 20px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease;
+}
+
+.sell-form:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sell-form input {
+    padding: 5px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    transition: box-shadow 0.3s ease;
+}
+
+.sell-form input:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.sell-form button {
+    padding: 8px 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sell-form button:hover {
+    background-color: #218838;
+}
+/* sell form styling ends*/

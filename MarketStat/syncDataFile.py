@@ -90,6 +90,7 @@ def feedCollection():
     
     collectionObject = [Collection(collectionName = collection) for collection in collections]
     Collection.objects.bulk_create(collectionObject)
+    print("Collection added successfully")
 
 addUsers()
 createPermission()

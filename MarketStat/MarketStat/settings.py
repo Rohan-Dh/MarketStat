@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'User',
     'crispy_forms',
     'crispy_bootstrap5',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 ROOT_URLCONF = 'MarketStat.urls'
 
@@ -141,7 +148,7 @@ PASSWORD_HASHERS = [
 ]
 
 LOGIN_REDIRECT_URL = "user:home"
-LOGOUT_REDIRECT_URL = "base:login"
+LOGOUT_REDIRECT_URL = "user:login"
 
 CRISPY_ALLOWED_TAMPLATE_PACKS ="bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"

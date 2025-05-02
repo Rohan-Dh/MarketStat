@@ -5,9 +5,9 @@ from django.conf import settings
 class UserProfile(models.Model):
     profileId = models.AutoField(primary_key=True)
     userId = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    userName = models.CharField(max_length=100, null=False)
-    profilePic = models.ImageField(upload_to='images/')
-    address = models.CharField(max_length=100)
+    userName = models.CharField(max_length=100, null=False, default="Unknown")
+    profilePic = models.ImageField(upload_to='images/', default=None, null=True)
+    address = models.CharField(max_length=100, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -33,7 +33,7 @@ class UserCollection(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.userCollectionId
+        return str(self.userCollectionId)
 
 class Transaction(models.Model):
     transactionId = models.AutoField(primary_key=True)
