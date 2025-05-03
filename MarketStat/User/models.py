@@ -15,7 +15,7 @@ class UserProfile(models.Model):
         return self.userName
     
 class Collection(models.Model):
-    collectionId = models.AutoField(max_length=100, primary_key=True)
+    collectionId = models.AutoField(primary_key=True)
     collectionName = models.CharField(max_length=100, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -37,7 +37,12 @@ class UserCollection(models.Model):
 
 class Transaction(models.Model):
     transactionId = models.AutoField(primary_key=True)
-    collectionId = models.ForeignKey('Collection', on_delete=models.DO_NOTHING)
+    user_collection = models.ForeignKey(
+        'UserCollection', 
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
     quantitySold = models.IntegerField()
     soldPrice = models.IntegerField()
     profit = models.IntegerField()

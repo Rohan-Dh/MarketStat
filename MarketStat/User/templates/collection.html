@@ -31,30 +31,43 @@
     <div class="card-top">
         <div class="image-section"></div>
         <div class="content-section">
-            {{userCollection.collectionName}}
+            <input type="hidden" value="{{userCollection.collection.collectionId}}"></input>
+            <h6>{{userCollection.collection.collectionName}}</h6>
+            <div class="available-quantity"><strong>Available Quantity</strong></br>{{ userCollection.quantity }}</div>
+            <div class"price-per-unit"><strong>Price per unit</strong></br>{{ userCollection.initialPrice }}</div>
         </div>
     </div>
     <div class="card-bottom">
-        <button type="button" class="btn btn-primary"
-            onclick="toggleSellForm({{userCollection.userCollectionId}})">Sell</button>
+        <button type="button" class="btn btn-primary" onclick="openSellForm('{{userCollection.userCollectionId}}')">Sell</button>
         <button type="submit" class="btn btn-primary">Update</button>
-        <button type="submit" class="btn btn-danger">Delete</button>
+        <form method="GET" action="{% url 'user:deleteCollection' userCollection.userCollectionId %}">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
     </div>
-    <form id="sellForm-{{userCollection.userCollectionId }}"
-        action="{% url 'user:sellCollection' userCollection.userCollectionId %}" method="post" class="sell-form"
-        style="display: none;">
-        {% csrf_token %}
-        <label for="quantity">Quantity:</label>
-        <input type="number" name="quantity" min="1" required>
-
-        <label for="price">Price:</label>
-        <input type="number" name="price" step="0.01" required>
-
-        <label for="soldTo">Sold To (optional):</label>
-        <input type="text" name="soldTo">
-
-        <button type="submit">Confirm Sell</button>
-    </form>
+    <div class="modal-overlay">
+        <form id="sellForm-{{userCollection.userCollectionId}}" 
+              action="{% url 'user:sellCollection' userCollection.userCollectionId %}" 
+              method="post"
+              class="sell-form">
+            <div class="form-header">
+                <h2 class="form-title">Sell Collection</h2>
+                <button type="button" class="close-btn" onclick="closeSellForm('{{userCollection.userCollectionId}}')">&times;</button>
+            </div>
+            {% csrf_token %}
+            <label for="quantity">Quantity:</label>
+            <input type="number" name="quantity" min="1" id="quantity" required>
+    
+            <label for="price">Price:</label>
+            <input id="price" type="number" name="price" step="0.01" required>
+    
+            <label for="soldTo">Sold To (optional):</label>
+            <input id="soldTo" type="text" name="soldTo">
+    
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="submit">Confirm Sell</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endfor %}
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import auth
 from rest_framework.response import Response
 from .serializers import *
@@ -58,29 +58,27 @@ def collection(request):
                 quantity = quantity,
                 initialPrice = initialPrice
             ).save()
-            collections = Collection.objects.all()
             return redirect('user:collection')
         else:
             collections = Collection.objects.all()
-            userCollections = UserCollection.objects.filter(userId = request.user.id)
-            serializer = CollectionUserCollectionSerializer(userCollections, many=True)
-            return Response(serializer.data)
             return render(
                 request, 
-                'collection.html', 
+                'collection.html',
                 {
                     "form":form, 
                     "collections": collections, 
                     "userCollections": userCollections,
                     })
     else:
+        userCollections = UserCollection.objects.filter(userId = request.user.id)
+        serializer = CollectionUserCollectionSerializer(userCollections, many=True).data
         collections = Collection.objects.all()
         return render(
             request, 
             'collection.html', 
             {
                 "collections": collections, 
-                "userCollections": userCollections,
+                "userCollections": serializer,
                 })
     
     
@@ -94,8 +92,14 @@ def updateCollection(request, Collection_id):
     return HttpResponse("update")
 
 @login_required
-def deleteCollection(request, Collection_id):
-    return HttpResponse("delete")
+def deleteCollection(request, userCollectionId):
+    try:
+        userCollectionObject = UserCollection.objects.filter(userCollectionId = userCollectionId)
+    except UserCollection.DoesNotExist:
+        error = "collection doesn't exists"
+        return redirect("user:collection")
+    userCollectionObject.delete()
+    return redirect("user:collection")
 
 @login_required
 def sellCollection(request, Collection_id):

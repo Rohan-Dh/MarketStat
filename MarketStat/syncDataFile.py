@@ -78,7 +78,6 @@ def feedCollection():
     "Ethnic wear for kids",
     "Tops and blouses",
     "T-shirts",
-    "Dresses (casual, party, gowns)",
     "Kurtis and tunics",
     "Sarees",
     "Salwar suits",
@@ -87,13 +86,23 @@ def feedCollection():
     "Jeans and pants",
     "Shrugs and jackets",
     "Dupattas and stoles",]
-    
-    collectionObject = [Collection(collectionName = collection) for collection in collections]
-    Collection.objects.bulk_create(collectionObject)
-    print("Collection added successfully")
 
-addUsers()
-createPermission()
-createRole()
-assignPermission()
+    existingCollections = list(Collection.objects.all().values())
+    existingCollectionName = set([existingCollection["collectionName"] for existingCollection in existingCollections])
+
+    collectionObject = set([collection for collection in collections])
+    print(collectionObject)
+    print(existingCollectionName)
+    
+    return
+
+
+    # collectionObject = [Collection(collectionName = collection) for collection in collections]
+    # Collection.objects.bulk_create(collectionObject)
+    # print("Collection added successfully")
+
+# addUsers()
+# createPermission()
+# createRole()
+# assignPermission()
 feedCollection()
