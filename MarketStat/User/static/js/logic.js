@@ -90,3 +90,61 @@ document.addEventListener('keydown', function (event) {
   }
 });
 // update collection starts
+
+
+// pop up error message starts
+function showNotification(message, type = 'error', duration = 5000) {
+  const container = document.getElementById('notificationContainer');
+  
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  
+  const progress = document.createElement('div');
+  progress.className = 'notification-progress';
+  
+  const content = `
+      <button class="notification-close"></button>
+      <div class="notification-content">
+          <div class="notification-icon">
+              ${type === 'error' ? '⚠️' : 
+               type === 'success' ? '✓' :
+               type === 'warning' ? '⚠️' : 'i'}
+          </div>
+          <div class="notification-text">
+              <div class="notification-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+              <div class="notification-message">${message}</div>
+          </div>
+      </div>
+  `;
+  
+  notification.innerHTML = content;
+  notification.appendChild(progress);
+  container.appendChild(notification);
+  
+  // Trigger animation
+  setTimeout(() => notification.classList.add('active'), 10);
+  
+  // Progress bar animation
+  progress.style.width = '100%';
+  progress.style.transitionDuration = `${duration}ms`;
+  setTimeout(() => progress.style.width = '0%', 10);
+  
+  // Auto-remove after duration
+  setTimeout(() => {
+      notification.classList.remove('active');
+      setTimeout(() => notification.remove(), 300);
+  }, duration);
+  
+  // Close button handler
+  notification.querySelector('.notification-close').addEventListener('click', () => {
+      notification.classList.remove('active');
+      setTimeout(() => notification.remove(), 300);
+  });
+}
+
+// Example usage:
+// showNotification('Invalid email address', 'error', 5000);
+// showNotification('Payment successful!', 'success', 3000);
+// showNotification('System update available', 'info', 4000);
+// showNotification('Low disk space', 'warning', 5000);
+// pop up error message ends
