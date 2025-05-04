@@ -15,6 +15,9 @@
                 <li class="nav-Collection">
                     <a class="nav-link active" aria-current="page" href="#">Collections</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "user:notification"%}">Notifications</a>
+                </li>
                 <li class="nav-Collection">
                     <a class="nav-link profile" href="#">Profile</a>
                 </li>
@@ -31,7 +34,6 @@
     <div class="card-top">
         <div class="image-section"></div>
         <div class="content-section">
-            <input type="hidden" value="{{userCollection.collection.collectionId}}"></input>
             <h6>{{userCollection.collection.collectionName}}</h6>
             <div class="available-quantity"><strong>Available Quantity</strong></br>{{ userCollection.quantity }}</div>
             <div class"price-per-unit"><strong>Price per unit</strong></br>{{ userCollection.initialPrice }}</div>
@@ -39,11 +41,40 @@
     </div>
     <div class="card-bottom">
         <button type="button" class="btn btn-primary" onclick="openSellForm('{{userCollection.userCollectionId}}')">Sell</button>
-        <button type="submit" class="btn btn-primary">Update</button>
-        <form method="GET" action="{% url 'user:deleteCollection' userCollection.userCollectionId %}">
-            <button type="submit" class="btn btn-danger">Delete</button>
+        <button onclick="showDeleteModal('{{ userCollection.userCollectionId }}', '{{ userCollection.collection.collectionName }}')" class="btn btn-danger">Delete</button>
+        <button onclick="openUpdateForm('{{ userCollection.userCollectionId }}')" class="btn btn-primary">Update</button>
+    </div>
+
+    <div class="modal-overlay">
+        <form id="updateForm-{{userCollection.userCollectionId}}" 
+            action="{% url 'user:updateCollection' userCollection.userCollectionId %}" 
+            method="post"
+            class="sell-form">
+            <div class="form-header">
+                <h2 class="form-title">Update Collection</h2>
+                <button type="button" class="close-btn" onclick="closeUpdateForm('{{userCollection.userCollectionId}}')">&times;</button>
+            </div>
+            {% csrf_token %}
+            <label for="update-collection">Collection Name</label>
+            <select id="update-collection" name="collectionId">
+                <option value="">Select a collection</option>
+                {% for collection in collections %}
+                <option value="{{collection.collectionId}}">{{ collection.collectionName }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="quantity">Available Quantity:</label>
+            <input type="number" name="changedQuantity" id="quantity" min='1' value="{{userCollection.quantity}}">
+    
+            <label for="price">Price:</label>
+            <input id="price" type="number" name="changedPrice" min='1' value="{{userCollection.initialPrice}}">
+    
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="submit">Update</button>
+            </div>
         </form>
     </div>
+
     <div class="modal-overlay">
         <form id="sellForm-{{userCollection.userCollectionId}}" 
               action="{% url 'user:sellCollection' userCollection.userCollectionId %}" 
@@ -55,10 +86,10 @@
             </div>
             {% csrf_token %}
             <label for="quantity">Quantity:</label>
-            <input type="number" name="quantity" min="1" id="quantity" required>
+            <input type="number" name="soldQuantity" min="1" id="quantity" required>
     
             <label for="price">Price:</label>
-            <input id="price" type="number" name="price" step="0.01" required>
+            <input id="price" type="number" name="soldPrice" required>
     
             <label for="soldTo">Sold To (optional):</label>
             <input id="soldTo" type="text" name="soldTo">
@@ -68,8 +99,25 @@
             </div>
         </form>
     </div>
+
+    <div class="delete-form">
+        <div class="modal-overlay" id="deleteModal-{{ userCollection.userCollectionId }}">
+            <div class="form-container">
+                <div class="warning-icon">⚠️</div>
+                <h2>Delete Collection</h2>
+                <p class="confirm-text">Are you sure you want to delete "<span id="collectionNameSpan"></span>"?</p>
+                <form method="GET" action="{% url 'user:deleteCollection' userCollection.userCollectionId %}">
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="button" class="btn cancel" onclick="closeDeleteModal({{userCollection.userCollectionId}})">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 {% endfor %}
+
 
 <div id="popupForm" class="form-popup">
     <form class="form-container" method="POST" action="{% url 'user:collection' %}">
@@ -96,3 +144,5 @@
 
 <button class="add-button button" onclick="toggleForm()">ADD</button>
 {% endblock content %}
+
+

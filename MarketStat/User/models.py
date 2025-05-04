@@ -45,8 +45,9 @@ class Transaction(models.Model):
     )
     quantitySold = models.IntegerField()
     soldPrice = models.IntegerField()
-    profit = models.IntegerField()
-    soldTo = models.CharField(max_length=100)
+    profit = models.IntegerField(default=None, null=True)
+    loss = models.IntegerField(default=None, null=True)
+    soldTo = models.CharField(max_length=100, default=None, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

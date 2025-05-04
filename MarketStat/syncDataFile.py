@@ -85,24 +85,26 @@ def feedCollection():
     "Skirts",
     "Jeans and pants",
     "Shrugs and jackets",
-    "Dupattas and stoles",]
+    "Dupattas and stoles",
+    ]
 
     existingCollections = list(Collection.objects.all().values())
     existingCollectionName = set([existingCollection["collectionName"] for existingCollection in existingCollections])
 
     collectionObject = set([collection for collection in collections])
-    print(collectionObject)
-    print(existingCollectionName)
     
-    return
+    collectionObjects = collectionObject - existingCollectionName
+    if len(list(collectionObjects)) == 0:
+        print("No new element to add")
+        return
+    else:
+        collection = Collection()
+        for collectionObject in list(collectionObjects):
+            collection.collectionName = collectionObject
+            collection.save()
 
-
-    # collectionObject = [Collection(collectionName = collection) for collection in collections]
-    # Collection.objects.bulk_create(collectionObject)
-    # print("Collection added successfully")
-
-# addUsers()
-# createPermission()
-# createRole()
-# assignPermission()
+addUsers()
+createPermission()
+createRole()
+assignPermission()
 feedCollection()
