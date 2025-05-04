@@ -57,7 +57,7 @@
             {% csrf_token %}
             <label for="update-collection">Collection Name</label>
             <select id="update-collection" name="collectionId">
-                <option value="">Select a collection</option>
+                <option value="{{userCollection.collection.collectionId}}">Select a collection</option>
                 {% for collection in collections %}
                 <option value="{{collection.collectionId}}">{{ collection.collectionName }}</option>
                 {% endfor %}

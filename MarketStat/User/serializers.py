@@ -25,3 +25,11 @@ class CollectionUserCollectionSerializer(serializers.ModelSerializer):
         model = UserCollection
         fields = ["userCollectionId", "collection", "quantity", "initialPrice", "created_at", "updated_at", "user"]
     
+
+class TransactionSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format="%d %b %Y, %I:%M %p")
+    updated_at = serializers.DateTimeField(format="%d %b %Y, %I:%M %p")
+    collection = CollectionUserCollectionSerializer(source = "user_collection")
+    class Meta:
+        model = Transaction
+        fields = ["transactionId", "quantitySold", "soldPrice", "profit", "loss", "soldTo", "created_at", "updated_at", "collection"]

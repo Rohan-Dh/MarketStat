@@ -37,7 +37,8 @@
                 <li class="notification-card">
                     <div class="notification-content">
                         <div class="transaction-header">
-                            <span class="transaction-time">{{ transaction.created_at|date:"Y-m-d H:i" }}</span>
+                            <span class="transaction-id">{{ transaction.collection.collection.collectionName }}</span>
+                            <span class="transaction-time">{{ transaction.created_at}}</span>
                         </div>
                         <div class="transaction-details">
                             {% if transaction.soldTo %}
@@ -45,11 +46,11 @@
                             {% endif %}
                             <div class="amount-group">
                                 <div class="amount-item">
-                                    <span class="amount-label">Qty:</span>
+                                    <span class="amount-label">Sold Quantity:</span>
                                     <span class="amount-value">{{ transaction.quantitySold }}</span>
                                 </div>
                                 <div class="amount-item">
-                                    <span class="amount-label">Price:</span>
+                                    <span class="amount-label">Sold Price:</span>
                                     <span class="amount-value">₹{{ transaction.soldPrice }}</span>
                                 </div>
                             </div>

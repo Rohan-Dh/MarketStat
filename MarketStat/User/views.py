@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import auth
 from .serializers import *
 from .models import *
@@ -97,6 +97,7 @@ def updateCollection(request, userCollectionId):
         collectionObject = get_object_or_404(UserCollection, userCollectionId=userCollectionId)
         collectionObject.quantity = form.cleaned_data['changedQuantity']
         collectionObject.initialPrice = form.cleaned_data['changedPrice']
+        collectionObject.collectionId = Collection.objects.get(collectionId = request.POST["collectionId"])
         collectionObject.save()
         return redirect('user:collection')
     return redirect('user:collection')
@@ -148,8 +149,8 @@ def sellCollection(request, userCollectionId):
         user_collection=user_collection,
         soldPrice=sold_price,
         soldTo=sold_to,
-        profit=profit_or_loss if profit_or_loss > 0 else 0,
-        loss=-profit_or_loss if profit_or_loss < 0 else 0
+        profit=sold_quantity * profit_or_loss if profit_or_loss > 0 else 0,
+        loss= sold_quantity * -profit_or_loss if profit_or_loss < 0 else 0
     )
 
     user_collection.quantity -= sold_quantity
@@ -161,5 +162,7 @@ def sellCollection(request, userCollectionId):
 def notification(request):
     userCollections = list(UserCollection.objects.filter(userId = request.user.id).values())
     userCollections = [collection["userCollectionId"] for collection in userCollections]
-    transactions = Transaction.objects.filter(user_collection__in = userCollections).values()
-    return render(request, 'notification.html', {'transactions': transactions})
+    transactions = Transaction.objects.filter(user_collection__in = userCollections)
+    serializer = TransactionSerializer(transactions, many=True)
+    # return JsonResponse(serializer.data, safe=False)
+    return render(request, 'notification.html', {'transactions': serializer.data})

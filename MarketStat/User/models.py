@@ -39,7 +39,7 @@ class Transaction(models.Model):
     transactionId = models.AutoField(primary_key=True)
     user_collection = models.ForeignKey(
         'UserCollection', 
-        on_delete=models.SET_NULL,
+        on_delete=models.DO_NOTHING,
         null=True,
         blank=True
     )
