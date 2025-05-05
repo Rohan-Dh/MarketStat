@@ -12,9 +12,6 @@ from .forms import *
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-def adminLogin(request):
-    return HttpResponse("admin login")
-
 class CustomLoginView(LoginView):
     redirect_authenticated_user = True
     template_name = 'registration/login.html'
