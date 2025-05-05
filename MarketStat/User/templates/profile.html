@@ -1,31 +1,74 @@
 {% extends "base.html" %}
 {% block content %}
-<nav class="navbar navbar-expand-lg bg-body-tertiary-custom">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">MarketStat</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{% url "user:home"%}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#">Collections</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "user:notification"%}">Notifications</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "user:logout"%}">Logout</a>
-                </li>
-            </ul>
+{% include "navbar.html" %}
+
+<div class="profile-container">
+    <!-- Success/Error Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}"{% endif %}>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="avatar-container">
+            {% if user_profile.profilePic %}
+                <img src="{{ user_profile.profilePic.url }}" alt="{{ user_profile.userName }}" class="profile-avatar">
+            {% else %}
+                <div class="avatar-placeholder">{{ user_profile.userName|first }}</div>
+            {% endif %}
+        </div>
+        <h1 class="profile-name">{{ user_profile.userName }}</h1>
+        <p class="profile-joined">Member since {{ user_profile.created_at|date:"F Y" }}</p>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="profile-details">
+        <form method="POST" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            
+            <!-- Form Errors -->
+            {% if form.errors %}
+                <div class="form-errors">
+                    {% for error in form.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Form Fields -->
+            <div class="form-group">
+                <label for="id_profilePic">Profile Picture</label>
+                {{ form.profilePic }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_userName">Username</label>
+                {{ form.userName }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_address">Address</label>
+                {{ form.address }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save">Update Profile</button>
+            </div>
+        </form>
+
+        <!-- Profile Metadata -->
+        <div class="profile-meta">
+            <div class="meta-item">
+                <span class="meta-label">Last Updated:</span>
+                <span class="meta-value">{{ user_profile.updated_at|date:"M d, Y H:i" }}</span>
+            </div>
         </div>
     </div>
-</nav>
+</div>
 {% endblock content %}

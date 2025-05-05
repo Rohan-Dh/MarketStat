@@ -39,7 +39,7 @@ class Transaction(models.Model):
     transactionId = models.AutoField(primary_key=True)
     user_collection = models.ForeignKey(
         'UserCollection', 
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
@@ -50,6 +50,9 @@ class Transaction(models.Model):
     soldTo = models.CharField(max_length=100, default=None, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return str(self.transactionId)

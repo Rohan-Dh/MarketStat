@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import auth
 from .serializers import *
@@ -14,6 +15,19 @@ User = get_user_model()
 def adminLogin(request):
     return HttpResponse("admin login")
 
+class CustomLoginView(LoginView):
+    redirect_authenticated_user = True
+    template_name = 'registration/login.html'
+    def form_valid(self, form):
+        remember_me = self.request.POST.get('remember_me', False)
+        if not remember_me:
+            self.request.session.set_expiry(0)
+            self.request.session.modified = True
+        else:
+            print("success")
+            self.request.session.set_expiry(30*24*60*60)
+            self.request.session.modified = True
+        return super().form_valid(form)
 
 def authView(request):
     if request.method == "POST":
@@ -104,11 +118,7 @@ def updateCollection(request, userCollectionId):
 
 @login_required
 def deleteCollection(request, userCollectionId):
-    try:
-        userCollectionObject = UserCollection.objects.filter(userCollectionId = userCollectionId)
-    except UserCollection.DoesNotExist:
-        error = "collection doesn't exists"
-        return redirect("user:collection")
+    userCollectionObject = UserCollection.objects.get(userCollectionId = userCollectionId)
     userCollectionObject.delete()
     return redirect("user:collection")
 
@@ -166,3 +176,10 @@ def notification(request):
     serializer = TransactionSerializer(transactions, many=True)
     # return JsonResponse(serializer.data, safe=False)
     return render(request, 'notification.html', {'transactions': serializer.data})
+
+@login_required
+def profileView(request):
+    if request.method == "POST":
+        return HttpResponse("POST")
+    else:
+        return render(request, 'profile.html', {})

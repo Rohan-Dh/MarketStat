@@ -92,16 +92,18 @@ def feedCollection():
     existingCollectionName = set([existingCollection["collectionName"] for existingCollection in existingCollections])
 
     collectionObject = set([collection for collection in collections])
-    
     collectionObjects = collectionObject - existingCollectionName
+
+    print(collectionObjects)
     if len(list(collectionObjects)) == 0:
         print("No new element to add")
         return
     else:
-        collection = Collection()
         for collectionObject in list(collectionObjects):
+            collection = Collection()
             collection.collectionName = collectionObject
             collection.save()
+        print("Collection added successfully")
 
 addUsers()
 createPermission()

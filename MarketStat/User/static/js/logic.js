@@ -89,7 +89,7 @@ document.addEventListener('keydown', function (event) {
     closeUpdateForm();
   }
 });
-// update collection starts
+// update collection ends
 
 
 // pop up error message starts
@@ -141,10 +141,4 @@ function showNotification(message, type = 'error', duration = 5000) {
       setTimeout(() => notification.remove(), 300);
   });
 }
-
-// Example usage:
-// showNotification('Invalid email address', 'error', 5000);
-// showNotification('Payment successful!', 'success', 3000);
-// showNotification('System update available', 'info', 4000);
-// showNotification('Low disk space', 'warning', 5000);
 // pop up error message ends

@@ -7,6 +7,10 @@
       <h3>Login</h3>
       <form method="POST">
         {% csrf_token %} {{form}}
+        <div class="checkbox-text">
+          <label for="login-checkbox">Remember me</label>
+          <input id="login-checkbox" class="login-checkbox" type="checkbox" name="remember_me">
+        </div>
         <button type="submit">Submit</button>
       </form>
       <a class="signup-link" href="{% url 'user:authView' %}">Signup</a>

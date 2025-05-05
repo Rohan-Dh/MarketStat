@@ -6,6 +6,7 @@ app_name = "user"
 urlpatterns = [
     # path("", userLogin, name="userLogin"),
     path('home/', home, name="home"),
+    path("accounts/login/", CustomLoginView.as_view(), name='login'),
     path("accounts/", include("django.contrib.auth.urls")),
     path('login/', adminLogin, name="adminLogin"),
     path('logout/', logout, name="logout"),
@@ -15,4 +16,5 @@ urlpatterns = [
     path('collection/update/<int:userCollectionId>/', updateCollection, name='updateCollection'),
     path('collection/sell/<int:userCollectionId>/', sellCollection, name='sellCollection'),
     path('notification/', notification, name="notification"),
+    path('profile/', profileView, name="profile")
 ]
