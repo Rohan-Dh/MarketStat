@@ -175,10 +175,75 @@ def notification(request):
     return render(request, 'notification.html', {'transactions': serializer.data})
 
 @login_required
-def profileView(request):
+def profileView(request, userId=None):
     if request.method == "POST":
-        return HttpResponse("POST")
+        form = UserProfileForm(request.POST, request=request)
+        if form.is_valid():
+            firstName = form.cleaned_data["firstName"]
+            lastName = form.cleaned_data["lastName"]
+            address = form.cleaned_data["address"]
+            email = form.cleaned_data["email"]
+
+            profileObj = get_object_or_404(UserProfile, userId=userId)
+            userObj = get_object_or_404(User, id=userId)
+            userObj.first_name = firstName
+            userObj.last_name = lastName
+            profileObj.address = address
+            profileObj.userName = firstName + " " + lastName if lastName else ""
+            userObj.save()
+            profileObj.save()
+
+            if profileObj.email_verified and userObj.email == email:
+                request.session['show_code_form'] = False
+            else:
+                request.session['show_code_form'] = True
+
+            request.session['submitted_email'] = email
+
+            return redirect('user:profile', userId=userId)
+
+
     else:
-        profile = UserProfile.objects.get(userId = request.user.id)
-        print(profile.profilePic.url)
-        return render(request, 'profile.html', {"userProfile": profile})
+        emailNotVerified = False
+        if 'emailNotVerified' in request.session:
+            emailNotVerified = request.session.pop('emailNotVerified')
+
+    profile = UserProfile.objects.get(userId=request.user.id)
+    profile_data = UserProfileSerializer(profile).data
+    form = UserProfileForm()
+    
+    show_code_form = request.session.pop('show_code_form', False)
+    email = request.session.pop('submitted_email', profile.userId.email)
+
+    return render(request, 'profile.html', {
+        'form': form,
+        'userProfile': profile_data,
+        'show_code_form': show_code_form,
+        'email': email,
+        'emailNotVerified': emailNotVerified,
+    })
+
+
+
+@login_required
+def changeProfile(request):
+    return HttpResponse("Change Profile")
+
+@login_required
+def verifyEmail(request):
+    if request.method == "POST":
+        data = request.POST
+        inputCode = data['firstNumber'] + data['secondNumber'] + data['thirdNumber'] +data['forthNumber']
+        actualCode = data["actualCode"]
+        if inputCode == actualCode:
+            userObj = get_object_or_404(User, id = request.user.id)
+            profileObj = get_object_or_404(UserProfile, userId = request.user.id)
+            userObj.email = data['email']
+            profileObj.email_verified = True
+            userObj.save()
+            profileObj.save()
+            return redirect('user:profile', userId = request.user.id)
+        else:
+            request.session['emailNotVerified'] = "Email is not verified. Code doesn't match"
+            return redirect('user:profile', userId = request.user.id)
+            

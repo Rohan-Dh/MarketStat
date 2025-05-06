@@ -33,3 +33,11 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ["transactionId", "quantitySold", "soldPrice", "profit", "loss", "soldTo", "created_at", "updated_at", "collection"]
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    userId = UserSerializer()
+    created_at = serializers.DateTimeField(format="%b %Y")
+    class Meta:
+        model = UserProfile
+        fields = "__all__"

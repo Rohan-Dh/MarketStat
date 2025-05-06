@@ -95,20 +95,20 @@ document.addEventListener('keydown', function (event) {
 // pop up error message starts
 function showNotification(message, type = 'error', duration = 5000) {
   const container = document.getElementById('notificationContainer');
-  
+
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
-  
+
   const progress = document.createElement('div');
   progress.className = 'notification-progress';
-  
+
   const content = `
       <button class="notification-close"></button>
       <div class="notification-content">
           <div class="notification-icon">
-              ${type === 'error' ? '⚠️' : 
-               type === 'success' ? '✓' :
-               type === 'warning' ? '⚠️' : 'i'}
+              ${type === 'error' ? '⚠️' :
+      type === 'success' ? '✓' :
+        type === 'warning' ? '⚠️' : 'i'}
           </div>
           <div class="notification-text">
               <div class="notification-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
@@ -116,29 +116,44 @@ function showNotification(message, type = 'error', duration = 5000) {
           </div>
       </div>
   `;
-  
+
   notification.innerHTML = content;
   notification.appendChild(progress);
   container.appendChild(notification);
-  
+
   // Trigger animation
   setTimeout(() => notification.classList.add('active'), 10);
-  
+
   // Progress bar animation
   progress.style.width = '100%';
   progress.style.transitionDuration = `${duration}ms`;
   setTimeout(() => progress.style.width = '0%', 10);
-  
+
   // Auto-remove after duration
   setTimeout(() => {
-      notification.classList.remove('active');
-      setTimeout(() => notification.remove(), 300);
+    notification.classList.remove('active');
+    setTimeout(() => notification.remove(), 300);
   }, duration);
-  
+
   // Close button handler
   notification.querySelector('.notification-close').addEventListener('click', () => {
-      notification.classList.remove('active');
-      setTimeout(() => notification.remove(), 300);
+    notification.classList.remove('active');
+    setTimeout(() => notification.remove(), 300);
   });
 }
 // pop up error message ends
+
+
+// profile form starts
+function openProfileForm() {
+  const form = document.getElementById('profile-form');
+  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+}
+
+function cancelCodeForm() {
+  const container = document.querySelector(".show-code-form");
+  if (container) {
+    container.style.display = "none";
+  }
+}
+// profile form ends

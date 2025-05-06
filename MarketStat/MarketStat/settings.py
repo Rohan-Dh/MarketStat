@@ -157,6 +157,14 @@ LOGOUT_REDIRECT_URL = "user:login"
 CRISPY_ALLOWED_TAMPLATE_PACKS ="bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-SESSION_COOKIE_AGE = 1209600
+SESSION_COOKIE_AGE = 24 * 60 * 60
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'dh.rohan.dh@gmail.com'
+EMAIL_HOST_PASSWORD = 'rtcb lamo kqoi lucz'

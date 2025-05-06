@@ -18,39 +18,73 @@
     <div class="profile-header">
         <div class="avatar-container">
             {% if userProfile.profilePic %}
-                <img src="{{ userProfile.profilePic.url }}" alt="{{ userProfile.userName }}" class="profile-avatar">
+                <a href="{% url 'user:changeProfile' %}"><img src="{{ userProfile.profilePic }}" alt="{{ userProfile.userName }}" class="profile-avatar"></a>
             {% else %}
                 <div class="avatar-placeholder">{{ userProfile.userName|first }}</div>
             {% endif %}
         </div>
         <h1 class="profile-name">{{ userProfile.userName }}</h1>
-        <p class="profile-joined">Member since {{ userProfile.created_at|date:"F Y" }}</p>
+        <p class="profile-joined">Member since {{ userProfile.created_at }}</p>
     </div>
 
-    <!-- Profile Details -->
-    <div class="profile-details">
-        <form method="POST" enctype="multipart/form-data" class="profile-form">
-            {% csrf_token %}
-            
-            <!-- Form Errors -->
-            {% if form.errors %}
-                <div class="form-errors">
-                    {% for error in form.errors %}
-                        <p class="error">{{ error }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
+    <div class="profile-edit-button-container">
+        <button id="profile-edit-button" onclick="openProfileForm()">Edit Profile</button>
+    </div>
 
-            <button type="submit" class="profile-edit-button">Edit Profile</button>
-        </form>
+    {% if show_code_form %}
+        <div class="show-code-form">
+            <div class="code-form">
+                <form method="POST" action="{% url 'user:verifyEmail' %}">
+                    {% csrf_token %}
+                    <div class="code-inputs">
+                        <input name="actualCode" type="hidden" value="{{ request.session.email_verification_code }}">
+                        <input name="email" type="hidden" value="{{ email }}">
+                        <input class="first-number" type="text" name="firstNumber" maxlength="1" required>
+                        <input class="second-number" type="text" name="secondNumber" maxlength="1" required>
+                        <input class="third-number" type="text" name="thirdNumber" maxlength="1" required>
+                        <input class="forth-number" type="text" name="forthNumber" maxlength="1" required>
+                    </div>
+                    <button type="submit" class="code-confirm-button">Confirm</button>
+                </form>
+                <button class="code-cancel-button" type="button" onclick="cancelCodeForm()"> Cancel</button>
+            </div>
+        </div>
+    {% endif %}
 
-        <!-- Profile Metadata -->
-        <div class="profile-meta">
-            <div class="meta-item">
-                <span class="meta-label">Last Updated:</span>
-                <span class="meta-value">{{ userProfile.updated_at|date:"M d, Y H:i" }}</span>
+    {% if  form.errors %}
+    {{form}}
+    {% endif %}
+
+    {% if emailNotVerified %}
+        {{emailNotVerified}}
+    {%endif%}
+
+    <div class=""></div>
+
+    <div id="profile-form" style = "display: none;">
+        <div class="edit-profile-holder">
+            <div class="edit-profile">
+                <form action="{% url 'user:profile' request.user.id %}" method="POST">
+                    {% csrf_token %}
+                    <label for="firstName">First Name</label>
+                    <input id="firstName" type="text" name="firstName" value="{{ userProfile.userId.first_name|default:userProfile.userName }}" required>
+                    <label for="lastName">Last Name</label>
+                    <input id="lastName" type="text" name="lastName" value="{{ userProfile.userId.last_name|default:" " }}">
+                    <label for="email">Email</label>
+                    {% if not userProfile.email_verified %}
+                        <input id="email" type="email" name="email" required>
+                    {% else %}
+                        <input id="email" type="email" name="email" value="{{ userProfile.userId.email }}">
+                    {% endif %}
+                    <label for="address">Address</label>
+                    <input id="address" type="text" name="address" value="{{ userProfile.address }}">
+                    <label for="deactivate">Deactivate Account</label>
+                    <input id="deactivate" type="checkbox" name="deactivate">
+                    <button onclick=codeSetUp()>Update</button>
+                </form>
             </div>
         </div>
     </div>
+    
 </div>
 {% endblock content %}

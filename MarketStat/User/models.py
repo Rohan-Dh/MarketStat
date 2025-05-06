@@ -8,6 +8,7 @@ class UserProfile(models.Model):
     userName = models.CharField(max_length=100, null=False, default="Unknown")
     profilePic = models.ImageField(upload_to='ProfilePictures', default="default.jpg", null=True)
     address = models.CharField(max_length=100, null=True, default=None)
+    email_verified = models.BooleanField(default=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
