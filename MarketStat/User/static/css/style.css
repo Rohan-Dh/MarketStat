@@ -656,7 +656,7 @@ body {
     max-width: 800px;
     margin: 2rem auto;
     padding: 2rem;
-    background: #ffffff;
+    background: #033d4b;
     border-radius: 16px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -736,10 +736,11 @@ body {
 }
 
 /* Buttons */
-.btn-save {
-    background: #3B82F6;
+.profile-edit-button {
+    background: #08596da4;
     color: white;
-    padding: 0.75rem 1.5rem;
+    width: 120px;
+    height: 40px;
     border: none;
     border-radius: 8px;
     font-weight: 500;
@@ -747,8 +748,9 @@ body {
     transition: background 0.2s;
 }
 
-.btn-save:hover {
-    background: #2563EB;
+.profile-edit-button:hover {
+    box-shadow: 1px 1px 0.4px #888888;
+    background: #002b36;
 }
 
 /* Profile Meta */

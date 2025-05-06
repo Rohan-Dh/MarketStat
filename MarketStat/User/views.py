@@ -179,4 +179,6 @@ def profileView(request):
     if request.method == "POST":
         return HttpResponse("POST")
     else:
-        return render(request, 'profile.html', {})
+        profile = UserProfile.objects.get(userId = request.user.id)
+        print(profile.profilePic.url)
+        return render(request, 'profile.html', {"userProfile": profile})

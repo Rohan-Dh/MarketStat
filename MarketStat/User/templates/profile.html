@@ -17,14 +17,14 @@
     <!-- Profile Header -->
     <div class="profile-header">
         <div class="avatar-container">
-            {% if user_profile.profilePic %}
-                <img src="{{ user_profile.profilePic.url }}" alt="{{ user_profile.userName }}" class="profile-avatar">
+            {% if userProfile.profilePic %}
+                <img src="{{ userProfile.profilePic.url }}" alt="{{ userProfile.userName }}" class="profile-avatar">
             {% else %}
-                <div class="avatar-placeholder">{{ user_profile.userName|first }}</div>
+                <div class="avatar-placeholder">{{ userProfile.userName|first }}</div>
             {% endif %}
         </div>
-        <h1 class="profile-name">{{ user_profile.userName }}</h1>
-        <p class="profile-joined">Member since {{ user_profile.created_at|date:"F Y" }}</p>
+        <h1 class="profile-name">{{ userProfile.userName }}</h1>
+        <p class="profile-joined">Member since {{ userProfile.created_at|date:"F Y" }}</p>
     </div>
 
     <!-- Profile Details -->
@@ -41,32 +41,14 @@
                 </div>
             {% endif %}
 
-            <!-- Form Fields -->
-            <div class="form-group">
-                <label for="id_profilePic">Profile Picture</label>
-                {{ form.profilePic }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_userName">Username</label>
-                {{ form.userName }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_address">Address</label>
-                {{ form.address }}
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn-save">Update Profile</button>
-            </div>
+            <button type="submit" class="profile-edit-button">Edit Profile</button>
         </form>
 
         <!-- Profile Metadata -->
         <div class="profile-meta">
             <div class="meta-item">
                 <span class="meta-label">Last Updated:</span>
-                <span class="meta-value">{{ user_profile.updated_at|date:"M d, Y H:i" }}</span>
+                <span class="meta-value">{{ userProfile.updated_at|date:"M d, Y H:i" }}</span>
             </div>
         </div>
     </div>
