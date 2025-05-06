@@ -1,0 +1,16 @@
+argon2-cffi==23.1.0
+argon2-cffi-bindings==21.2.0
+asgiref==3.8.1
+bcrypt==4.3.0
+cffi==1.17.1
+crispy-bootstrap5==2025.4
+Django==5.1.7
+django-crispy-forms==2.4
+django-filter==25.1
+djangorestframework==3.16.0
+Markdown==3.8
+mysqlclient==2.2.7
+pillow==11.1.0
+pycparser==2.22
+sqlparse==0.5.3
+tzdata==2025.2
