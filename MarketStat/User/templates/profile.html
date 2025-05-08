@@ -28,7 +28,7 @@
     </div>
 
     <div class="profile-edit-button-container">
-        <button id="profile-edit-button" onclick="openProfileForm()">Edit Profile</button>
+        <button id="profile-edit-button" onclick="event.stopPropagation(); openProfileForm();">Edit Profile</button>
     </div>
 
     {% if show_code_form %}
@@ -78,9 +78,7 @@
                     {% endif %}
                     <label for="address">Address</label>
                     <input id="address" type="text" name="address" value="{{ userProfile.address }}">
-                    <label for="deactivate">Deactivate Account</label>
-                    <input id="deactivate" type="checkbox" name="deactivate">
-                    <button onclick=codeSetUp()>Update</button>
+                    <button onclick="codeSetUp()">Update</button>
                 </form>
             </div>
         </div>

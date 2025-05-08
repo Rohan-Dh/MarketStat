@@ -202,11 +202,9 @@ def profileView(request, userId=None):
 
             return redirect('user:profile', userId=userId)
 
-
-    else:
-        emailNotVerified = False
-        if 'emailNotVerified' in request.session:
-            emailNotVerified = request.session.pop('emailNotVerified')
+    emailNotVerified = False
+    if 'emailNotVerified' in request.session:
+        emailNotVerified = request.session.pop('emailNotVerified')
 
     profile = UserProfile.objects.get(userId=request.user.id)
     profile_data = UserProfileSerializer(profile).data

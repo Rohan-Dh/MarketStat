@@ -953,13 +953,14 @@ body {
 .edit-profile-holder {
     position: relative;
     bottom: 250px;
+    left: 70px;
 }
 
 .edit-profile {
     position: absolute;
     height: 500px;
-    width: 700px;
-    background-color: #035a70e6;
+    width: 600px;
+    background-color: #094854e8;
     color: white;
     border: none;
     border-radius: 20px;
@@ -985,7 +986,7 @@ body {
     gap: 12px;
     max-width: 400px;
     margin: 0 auto;
-    padding-top: 15px;
+    padding-top: 40px;
 }
 
 .edit-profile input,
@@ -1008,5 +1009,22 @@ body {
     border-color: #3B82F6;
 }
 
+.edit-profile button {
+    margin-top: 40px;
+    width: 120px;
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    background: #08596da4;
+    cursor: pointer;
+    color: white;
+    border: none;
+    transition: background 0.2s;
+}
+
+.edit-profile button:hover {
+    box-shadow: -0.1em 0 0.4em black;
+    background: #002b36;
+}
 
 /* email verification code form ends*/

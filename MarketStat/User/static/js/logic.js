@@ -76,12 +76,6 @@ function closeUpdateForm(formId) {
   form.parentElement.style.display = 'none';
 }
 
-// Close when clicking outside
-window.addEventListener('click', function (event) {
-  if (event.target === document.getElementById(`updateModel-${collectionId}`)) {
-    closeUpdateForm();
-  }
-});
 
 // Close with ESC key
 document.addEventListener('keydown', function (event) {
@@ -103,19 +97,19 @@ function showNotification(message, type = 'error', duration = 5000) {
   progress.className = 'notification-progress';
 
   const content = `
-      <button class="notification-close"></button>
-      <div class="notification-content">
-          <div class="notification-icon">
-              ${type === 'error' ? '⚠️' :
+  <button class="notification-close"></button>
+  <div class="notification-content">
+  <div class="notification-icon">
+  ${type === 'error' ? '⚠️' :
       type === 'success' ? '✓' :
         type === 'warning' ? '⚠️' : 'i'}
-          </div>
-          <div class="notification-text">
-              <div class="notification-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
-              <div class="notification-message">${message}</div>
-          </div>
-      </div>
-  `;
+    </div>
+    <div class="notification-text">
+    <div class="notification-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+    <div class="notification-message">${message}</div>
+    </div>
+    </div>
+    `;
 
   notification.innerHTML = content;
   notification.appendChild(progress);
@@ -147,7 +141,7 @@ function showNotification(message, type = 'error', duration = 5000) {
 // profile form starts
 function openProfileForm() {
   const form = document.getElementById('profile-form');
-  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+  form.style.display = 'flex';
 }
 
 function cancelCodeForm() {
@@ -157,3 +151,19 @@ function cancelCodeForm() {
   }
 }
 // profile form ends
+
+
+// Close when clicking outside
+window.addEventListener('click', function (event) {
+  if (event.target === document.getElementById(`updateModel-${collectionId}`)) {
+    closeUpdateForm();
+  }
+});
+
+
+window.addEventListener('click', function (event) {
+  const form = document.getElementById('profile-form');
+  if (!form.contains(event.target)) {
+    form.style.display = 'none';
+  }
+});
