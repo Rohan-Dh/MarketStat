@@ -12,17 +12,42 @@ User = get_user_model()
 
 class CollectionForm(forms.Form):
     collectionId = forms.IntegerField(required=True)
-    quantity = forms.IntegerField(min_value=1, required=True)
-    initialPrice = forms.DecimalField(min_value=1, required=True, decimal_places=4)
+    quantity = forms.IntegerField(required=True)
+    initialPrice = forms.DecimalField(required=True, decimal_places=4)
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get("quantity")
+        if quantity < 1:
+            raise ValidationError("Quantity should be greater than 0.")
+        return quantity
+
+    def clean_initialPrice(self):
+        initialPrice = self.cleaned_data.get("initialPrice")
+        if initialPrice < 1:
+            raise ValidationError("Cost Price should be greater than 0.")
+        return initialPrice
 
 class SellForm(forms.Form):
     soldTo = forms.CharField(required=False)
-    soldQuantity = forms.IntegerField(min_value=1, required=True)
-    soldPrice = forms.DecimalField(min_value=1, required=True, decimal_places=4)
+    soldQuantity = forms.IntegerField(required=True)
+    soldPrice = forms.DecimalField(required=True, decimal_places=4)
+    
 
 class updateForm(forms.Form):
-    changedQuantity = forms.IntegerField(min_value=1, required=False)
-    changedPrice = forms.DecimalField(min_value=1, required=False)
+    changedQuantity = forms.IntegerField(required=False)
+    changedPrice = forms.DecimalField(required=False)
+
+    def clean_changedQuantity(self):
+        changedQuantity = self.cleaned_data.get("changedQuantity")
+        if(changedQuantity < 1):
+            raise ValidationError("Updated Quantity should be greater than 0.")
+        return changedQuantity
+        
+    def clean_changedPrice(self):
+        changedPrice = self.cleaned_data.get("changedPrice")
+        if(changedPrice < 1):
+            raise ValidationError("Updated cost price should be greater than 0.")
+        return self.changedPrice
 
 class UserProfileForm(forms.Form):
     firstName = forms.CharField(max_length=100, required=True)

@@ -62,7 +62,7 @@
             <input type="number" name="soldQuantity" min="1" id="quantity" required>
     
             <label for="price">Price:</label>
-            <input id="price" type="number" name="soldPrice" required>
+            <input id="price" type="number" name="soldPrice" min="1" required>
     
             <label for="soldTo">Sold To (optional):</label>
             <input id="soldTo" type="text" name="soldTo">
@@ -71,6 +71,11 @@
                 <button type="submit">Confirm Sell</button>
             </div>
         </form>
+        {% if check %}
+            <script>
+                openSellForm();
+            </script>
+        {% endif %}
     </div>
 
     <div class="delete-form">
@@ -91,8 +96,7 @@
 </div>
 {% endfor %}
 
-
-<div id="popupForm" class="form-popup">
+<div id="popupForm" class="form-popup" style="display: none;">
     <form class="form-container" method="POST" action="{% url 'user:collection' %}">
         {% csrf_token %}
         <h2>Add to Collection</h2>
@@ -117,7 +121,25 @@
 
 <button class="add-button button" onclick="toggleForm()">ADD</button>
 
-<div class="notification-container" id="notificationContainer"></div>
+{% if form %}
+    <div class="notification-container" id="notificationContainer"></div>
+    <script>
+        {% for field, errors in form.items %}
+            {% for error in errors %}
+                showNotification("{{ error }}", "error", 5000);
+            {% endfor %}
+        {% endfor %}
+    </script>
+{% endif %}
+
+{% if greaterSellingQuantityError %}
+    <div class="notification-container" id="notificationContainer"></div>
+    <script>
+        showNotification("{{ greaterSellingQuantityError }}", "error", 5000);
+    </script>
+{% endif %}
+
+
 {% endblock content %}
 
 

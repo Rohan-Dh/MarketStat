@@ -5,6 +5,7 @@ function toggleForm() {
 
 
 function openSellForm(formId) {
+  alert("hello");
   const form = document.getElementById(`sellForm-${formId}`);
   form.parentElement.style.display = 'flex';
 }

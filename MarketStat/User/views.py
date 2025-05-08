@@ -69,18 +69,17 @@ def collection(request):
                 initialPrice = initialPrice
             ).save()
             return redirect('user:collection')
-        return render(
-                request, 
-                'collection.html',
-                {
-                    "form":form, 
-                    "collections": collections, 
-                    "userCollections": serializer,
-                    })
+        # return JsonResponse(form.errors, safe=False)
+        request.session['form'] = form.errors
+        return redirect('user:collection')
+    form = CollectionForm()
+    if "form" in request.session:
+        form = request.session.pop('form')
     return render(
             request, 
             'collection.html', 
             {
+                "form": form,
                 "collections": collections, 
                 "userCollections": serializer,
                 })
@@ -121,49 +120,58 @@ def deleteCollection(request, userCollectionId):
 
 @login_required
 def sellCollection(request, userCollectionId):
-    if request.method != "POST":
-        return redirect('user:collection')
-
-    form = SellForm(request.POST)
-    user_collection = get_object_or_404(UserCollection, userCollectionId=userCollectionId)
     collections = Collection.objects.all()
-    user_collections = UserCollection.objects.filter(userId=request.user.id)
+    user_collection = get_object_or_404(UserCollection, userCollectionId=userCollectionId)
     user_collection_data = CollectionUserCollectionSerializer(user_collection).data
+    user_collections = UserCollection.objects.filter(userId=request.user.id)
     all_collections_data = CollectionUserCollectionSerializer(user_collections, many=True).data
 
-    if not form.is_valid():
-        return render(request, 'collection.html', {
-            "form": form,
-            "collections": collections,
-            "userCollections": all_collections_data,
-        })
+    if request.method == "POST":
+        form = SellForm(request.POST)
+        if not form.is_valid():
+            request.session['form'] = form.errors
+            request.session['check'] = True
+            return redirect('user:sellCollection', userCollectionId)
 
-    sold_to = form.cleaned_data['soldTo']
-    sold_quantity = form.cleaned_data['soldQuantity']
-    sold_price = form.cleaned_data['soldPrice']
+        sold_to = form.cleaned_data['soldTo']
+        sold_quantity = form.cleaned_data['soldQuantity']
+        sold_price = form.cleaned_data['soldPrice']
 
-    if sold_quantity > user_collection_data["quantity"]:
-        return render(request, 'collection.html', {
-            "error": ["You don't have that much quantity"],
-            "context": {"showPopUp": True},
-            "collections": collections,
-            "userCollections": all_collections_data,
-        })
+        if sold_quantity > user_collection_data["quantity"]:
+            request.session['greaterSellingQuantityError'] = "You don't have that much quantity"
+            request.session['check'] = True
+            return redirect('user:sellCollection', userCollectionId)
 
-    profit_or_loss = sold_price - user_collection_data["initialPrice"]
-    Transaction.objects.create(
-        quantitySold=sold_quantity,
-        user_collection=user_collection,
-        soldPrice=sold_price,
-        soldTo=sold_to,
-        profit=sold_quantity * profit_or_loss if profit_or_loss > 0 else 0,
-        loss= sold_quantity * -profit_or_loss if profit_or_loss < 0 else 0
-    )
+        profit_or_loss = sold_price - user_collection_data["initialPrice"]
+        Transaction.objects.create(
+            quantitySold=sold_quantity,
+            user_collection=user_collection,
+            soldPrice=sold_price,
+            soldTo=sold_to,
+            profit=sold_quantity * profit_or_loss if profit_or_loss > 0 else 0,
+            loss= sold_quantity * -profit_or_loss if profit_or_loss < 0 else 0
+        )
 
-    user_collection.quantity -= sold_quantity
-    user_collection.save()
-
-    return redirect('user:collection')
+        user_collection.quantity -= sold_quantity
+        user_collection.save()
+        return redirect('user:sellCollection', userCollectionId)
+    
+    greaterSellingQuantityError = None
+    check = False
+    form = None
+    if 'greaterSellingQuantityError' in request.session:
+        greaterSellingQuantityError = request.session.pop('greaterSellingQuantityError')
+    if 'check' in request.session:
+        check = request.session.pop('check')
+    if 'form' in request.session:
+        form = request.session.pop('form')
+    return render(request, 'collection.html', {
+        'form': form,
+        'check': check,
+        'greaterSellingQuantityError': greaterSellingQuantityError,
+        'collections': collections,
+        'userCollections': all_collections_data
+    })
 
 @login_required
 def notification(request):
@@ -176,6 +184,13 @@ def notification(request):
 
 @login_required
 def profileView(request, userId=None):
+    emailNotVerified = False
+    if 'emailNotVerified' in request.session:
+        emailNotVerified = request.session.pop('emailNotVerified')
+
+    profile = UserProfile.objects.get(userId=request.user.id)
+    profile_data = UserProfileSerializer(profile).data
+
     if request.method == "POST":
         form = UserProfileForm(request.POST, request=request)
         if form.is_valid():
@@ -199,17 +214,10 @@ def profileView(request, userId=None):
                 request.session['show_code_form'] = True
 
             request.session['submitted_email'] = email
-
             return redirect('user:profile', userId=userId)
-
-    emailNotVerified = False
-    if 'emailNotVerified' in request.session:
-        emailNotVerified = request.session.pop('emailNotVerified')
-
-    profile = UserProfile.objects.get(userId=request.user.id)
-    profile_data = UserProfileSerializer(profile).data
-    form = UserProfileForm()
+        return redirect('user:profile', userId=userId)
     
+    form = UserProfileForm()
     show_code_form = request.session.pop('show_code_form', False)
     email = request.session.pop('submitted_email', profile.userId.email)
 
