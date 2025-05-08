@@ -47,7 +47,7 @@ class updateForm(forms.Form):
         changedPrice = self.cleaned_data.get("changedPrice")
         if(changedPrice < 1):
             raise ValidationError("Updated cost price should be greater than 0.")
-        return self.changedPrice
+        return changedPrice
 
 class UserProfileForm(forms.Form):
     firstName = forms.CharField(max_length=100, required=True)

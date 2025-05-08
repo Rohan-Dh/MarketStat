@@ -68,7 +68,7 @@ def collection(request):
                 quantity = quantity,
                 initialPrice = initialPrice
             ).save()
-            request.session['success'] = f"{Collection.objects.get(collectionId=collectionId).collectionName} added successfully"
+            request.session['success'] = f"Collection {Collection.objects.get(collectionId=collectionId).collectionName} added successfully"
             return redirect('user:collection')
         # return JsonResponse(form.errors, safe=False)
         request.session['form'] = form.errors
@@ -96,10 +96,10 @@ def logout(request):
 
 @login_required
 def updateCollection(request, userCollectionId):
-    userCollections = UserCollection.objects.filter(userId = request.user.id)
+    userCollections = UserCollection.objects.filter(userId=request.user.id)
     serializer = CollectionUserCollectionSerializer(userCollections, many=True).data
     collections = Collection.objects.all()
-    success = False
+
     if request.method == "POST":
         form = updateForm(request.POST)
         if not form.is_valid():
@@ -108,14 +108,68 @@ def updateCollection(request, userCollectionId):
                 "collections": collections,
                 "userCollections": serializer
             })
+
         collectionObject = get_object_or_404(UserCollection, userCollectionId=userCollectionId)
+        oldCollectionName = collectionObject.collectionId.collectionName
+        newCollection = Collection.objects.get(collectionId=request.POST["collectionId"])
+        newCollectionName = newCollection.collectionName
+
+        quantitySame = collectionObject.quantity == form.cleaned_data['changedQuantity']
+        priceSame = collectionObject.initialPrice == form.cleaned_data['changedPrice']
+        collectionSame = collectionObject.collectionId == newCollection
+
+        # All 3 changed
+        if not collectionSame and not quantitySame and not priceSame:
+            request.session['success'] = (
+                f"{oldCollectionName} changed to {newCollectionName}\n"
+                f"with Quantity changed from {collectionObject.quantity} to {form.cleaned_data['changedQuantity']} and "
+                f"Cost Price changed from {collectionObject.initialPrice} to {form.cleaned_data['changedPrice']}"
+            )
+        # Collection and Quantity changed
+        elif not collectionSame and not quantitySame and priceSame:
+            request.session['success'] = (
+                f"{oldCollectionName} changed to {newCollectionName}\n"
+                f"with Quantity changed from {collectionObject.quantity} to {form.cleaned_data['changedQuantity']}"
+            )
+
+        # Collection and Price changed
+        elif not collectionSame and quantitySame and not priceSame:
+            request.session['success'] = (
+                f"{oldCollectionName} changed to {newCollectionName}\n"
+                f"with Cost Price changed from {collectionObject.initialPrice} to {form.cleaned_data['changedPrice']}"
+            )
+
+        # Quantity and Price changed (same collection)
+        elif collectionSame and not quantitySame and not priceSame:
+            request.session['success'] = (
+                f"Quantity changed from {collectionObject.quantity} to {form.cleaned_data['changedQuantity']}\n"
+                f"Cost Price changed from {collectionObject.initialPrice} to {form.cleaned_data['changedPrice']}"
+            )
+
+        # Only Collection changed
+        elif not collectionSame and quantitySame and priceSame:
+            request.session['success'] = f"{oldCollectionName} changed to {newCollectionName}"
+
+        # Only Quantity changed
+        elif collectionSame and not quantitySame and priceSame:
+            request.session['success'] = f"Quantity changed from {collectionObject.quantity} to {form.cleaned_data['changedQuantity']}"
+
+        # Only Price changed
+        elif collectionSame and quantitySame and not priceSame:
+            request.session['success'] = f"Cost Price changed from {collectionObject.initialPrice} to {form.cleaned_data['changedPrice']}"
+
+        # No changes
+        else:
+            request.session['success'] = "No changes were made."
+
         collectionObject.quantity = form.cleaned_data['changedQuantity']
         collectionObject.initialPrice = form.cleaned_data['changedPrice']
-        collectionObject.collectionId = Collection.objects.get(collectionId = request.POST["collectionId"])
+        collectionObject.collectionId = newCollection
         collectionObject.save()
-        request.session['success'] = f"You have successfully updated {Collection.objects.get(collectionId = request.POST["collectionId"]).collectionName}"
         return redirect('user:collection')
+
     return redirect('user:collection')
+
 
 @login_required
 def deleteCollection(request, userCollectionId):
