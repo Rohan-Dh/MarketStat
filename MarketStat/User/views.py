@@ -55,7 +55,7 @@ def collection(request):
     userCollections = UserCollection.objects.filter(userId = request.user.id)
     serializer = CollectionUserCollectionSerializer(userCollections, many=True).data
     collections = Collection.objects.all()
-
+    success = False
     if request.method == "POST":
         form = CollectionForm(request.POST)
         if form.is_valid():
@@ -68,6 +68,7 @@ def collection(request):
                 quantity = quantity,
                 initialPrice = initialPrice
             ).save()
+            request.session['success'] = f"{Collection.objects.get(collectionId=collectionId).collectionName} added successfully"
             return redirect('user:collection')
         # return JsonResponse(form.errors, safe=False)
         request.session['form'] = form.errors
@@ -75,6 +76,8 @@ def collection(request):
     form = CollectionForm()
     if "form" in request.session:
         form = request.session.pop('form')
+    if 'success' in request.session:
+        success = request.session.pop('success')
     return render(
             request, 
             'collection.html', 
@@ -82,6 +85,7 @@ def collection(request):
                 "form": form,
                 "collections": collections, 
                 "userCollections": serializer,
+                "success": success
                 })
     
     
@@ -95,6 +99,7 @@ def updateCollection(request, userCollectionId):
     userCollections = UserCollection.objects.filter(userId = request.user.id)
     serializer = CollectionUserCollectionSerializer(userCollections, many=True).data
     collections = Collection.objects.all()
+    success = False
     if request.method == "POST":
         form = updateForm(request.POST)
         if not form.is_valid():
@@ -103,12 +108,12 @@ def updateCollection(request, userCollectionId):
                 "collections": collections,
                 "userCollections": serializer
             })
-        
         collectionObject = get_object_or_404(UserCollection, userCollectionId=userCollectionId)
         collectionObject.quantity = form.cleaned_data['changedQuantity']
         collectionObject.initialPrice = form.cleaned_data['changedPrice']
         collectionObject.collectionId = Collection.objects.get(collectionId = request.POST["collectionId"])
         collectionObject.save()
+        request.session['success'] = f"You have successfully updated {Collection.objects.get(collectionId = request.POST["collectionId"]).collectionName}"
         return redirect('user:collection')
     return redirect('user:collection')
 
@@ -154,23 +159,29 @@ def sellCollection(request, userCollectionId):
 
         user_collection.quantity -= sold_quantity
         user_collection.save()
+        # return JsonResponse(user_collection_data, safe=False)
+        request.session['success'] = f"Sold {sold_quantity} {Collection.objects.get(collectionId = user_collection_data["collection"]["collectionId"]).collectionName} for amount {sold_price}"
         return redirect('user:sellCollection', userCollectionId)
     
     greaterSellingQuantityError = None
     check = False
     form = None
+    success = False
     if 'greaterSellingQuantityError' in request.session:
         greaterSellingQuantityError = request.session.pop('greaterSellingQuantityError')
     if 'check' in request.session:
         check = request.session.pop('check')
     if 'form' in request.session:
         form = request.session.pop('form')
+    if 'success' in request.session:
+        success = request.session.pop('success')
     return render(request, 'collection.html', {
         'form': form,
         'check': check,
         'greaterSellingQuantityError': greaterSellingQuantityError,
         'collections': collections,
-        'userCollections': all_collections_data
+        'userCollections': all_collections_data,
+        'success': success
     })
 
 @login_required

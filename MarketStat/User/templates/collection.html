@@ -139,6 +139,13 @@
     </script>
 {% endif %}
 
+{% if success %}
+    <div class="notification-container" id="notificationContainer"></div>
+    <script>
+        showNotification("{{ success }}", "success", 5000);
+    </script>
+{% endif %}
+
 
 {% endblock content %}
 
