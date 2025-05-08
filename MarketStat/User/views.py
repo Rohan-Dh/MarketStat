@@ -116,15 +116,17 @@ def updateCollection(request, userCollectionId):
 
         quantitySame = collectionObject.quantity == form.cleaned_data['changedQuantity']
         priceSame = collectionObject.initialPrice == form.cleaned_data['changedPrice']
+        print(collectionObject.collectionId == newCollection)
         collectionSame = collectionObject.collectionId == newCollection
 
         # All 3 changed
         if not collectionSame and not quantitySame and not priceSame:
             request.session['success'] = (
                 f"{oldCollectionName} changed to {newCollectionName}\n"
-                f"with Quantity changed from {collectionObject.quantity} to {form.cleaned_data['changedQuantity']} and "
+                f"with Quantity changed from {collectionObject.quantity} to {form.cleaned_data['changedQuantity']} and\n"
                 f"Cost Price changed from {collectionObject.initialPrice} to {form.cleaned_data['changedPrice']}"
             )
+
         # Collection and Quantity changed
         elif not collectionSame and not quantitySame and priceSame:
             request.session['success'] = (
@@ -175,6 +177,7 @@ def updateCollection(request, userCollectionId):
 def deleteCollection(request, userCollectionId):
     userCollectionObject = UserCollection.objects.get(userCollectionId = userCollectionId)
     userCollectionObject.delete()
+    request.session['success'] = f"{userCollectionObject.collectionId.collectionName} deleted successfully"
     return redirect("user:collection")
 
 @login_required
