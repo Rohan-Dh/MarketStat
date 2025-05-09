@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "navbar.html" %}
+
+Most Sold collection
+{% for obj  in collectionCount %}
+    
+{% endfor %}
+<div class="collection-card">
+    <div class="card-top">
+        <div class="image-section"></div>
+        <div class="content-section">
+            <h6>{{}}</h6>
+            <div class="available-quantity"><strong>Available Quantity</strong></br>{{ userCollection.quantity }}</div>
+            <div class"price-per-unit"><strong>Price per unit</strong></br>{{ userCollection.initialPrice }}</div>
+        </div>
+    </div>
+    <div class="card-bottom">
+        <button type="button" class="btn btn-primary" onclick="openSellForm('{{userCollection.userCollectionId}}')">Sell</button>
+        <button onclick="showDeleteModal('{{ userCollection.userCollectionId }}', '{{ userCollection.collection.collectionName }}')" class="btn btn-danger">Delete</button>
+        <button onclick="openUpdateForm('{{ userCollection.userCollectionId }}')" class="btn btn-primary">Update</button>
+    </div>

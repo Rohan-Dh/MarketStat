@@ -146,6 +146,13 @@
     </script>
 {% endif %}
 
+{% if error %}
+    <div class="notification-container" id="notificationContainer"></div>
+    <script>
+        showNotification("{{ error }}", "error", 5000);
+    </script>
+{% endif %}
+
 
 {% endblock content %}
 

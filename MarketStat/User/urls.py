@@ -18,4 +18,5 @@ urlpatterns = [
     path('profile/<int:userId>/', profileView, name="profile"),
     path('profile/change-profile/', changeProfile, name='changeProfile'),
     path('verifyEmail/', verifyEmail, name='verifyEmail'),
+    path('review/', review, name='review'),
 ]

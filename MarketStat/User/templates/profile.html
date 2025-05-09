@@ -55,9 +55,6 @@
     {{form}}
     {% endif %}
 
-    {% if emailNotVerified %}
-        {{emailNotVerified}}
-    {%endif%}
 
     <div class=""></div>
 
@@ -82,7 +79,19 @@
                 </form>
             </div>
         </div>
-    </div>
-    
+    </div>    
 </div>
+{% if success %}
+    <div class="notification-container" id="notificationContainer"></div>
+    <script>
+        showNotification("{{ success }}", "success", 5000);
+    </script>
+{% endif %}
+
+{% if error %}
+    <div class="notification-container" id="notificationContainer"></div>
+    <script>
+        showNotification("{{ error }}", "error", 5000);
+    </script>
+{% endif %}
 {% endblock content %}

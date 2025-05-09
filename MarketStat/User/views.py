@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, JsonResponse
 from django.contrib import auth
+from collections import Counter, defaultdict
 from .serializers import *
 from .models import *
 from .forms import *
@@ -55,9 +56,16 @@ def collection(request):
     userCollections = UserCollection.objects.filter(userId = request.user.id)
     serializer = CollectionUserCollectionSerializer(userCollections, many=True).data
     collections = Collection.objects.all()
+    CollectionsIds = [collection['collectionId_id'] for collection in list(userCollections.values())]
     success = False
+    error = False
+
     if request.method == "POST":
+        if int(request.POST.get('collectionId')) in CollectionsIds:
+            request.session['error'] = f"{Collection.objects.get(collectionId = request.POST.get('collectionId')).collectionName} already exists. Try updating it."
+            return redirect('user:collection')
         form = CollectionForm(request.POST)
+
         if form.is_valid():
             collectionId = form.cleaned_data['collectionId']
             quantity = form.cleaned_data['quantity']
@@ -78,10 +86,13 @@ def collection(request):
         form = request.session.pop('form')
     if 'success' in request.session:
         success = request.session.pop('success')
+    if 'error' in request.session:
+        error = request.session.pop('error')
     return render(
             request, 
             'collection.html', 
             {
+                "error": error,
                 "form": form,
                 "collections": collections, 
                 "userCollections": serializer,
@@ -252,9 +263,9 @@ def notification(request):
 
 @login_required
 def profileView(request, userId=None):
-    emailNotVerified = False
-    if 'emailNotVerified' in request.session:
-        emailNotVerified = request.session.pop('emailNotVerified')
+    error = False
+    if 'error' in request.session:
+        error = request.session.pop('error')
 
     profile = UserProfile.objects.get(userId=request.user.id)
     profile_data = UserProfileSerializer(profile).data
@@ -294,7 +305,7 @@ def profileView(request, userId=None):
         'userProfile': profile_data,
         'show_code_form': show_code_form,
         'email': email,
-        'emailNotVerified': emailNotVerified,
+        'error': error,
     })
 
 
@@ -313,11 +324,63 @@ def verifyEmail(request):
             userObj = get_object_or_404(User, id = request.user.id)
             profileObj = get_object_or_404(UserProfile, userId = request.user.id)
             userObj.email = data['email']
+            request.session['submitted_email'] = data['email']
             profileObj.email_verified = True
             userObj.save()
             profileObj.save()
+            request.session['success'] = "Email has been changed."
             return redirect('user:profile', userId = request.user.id)
         else:
-            request.session['emailNotVerified'] = "Email is not verified. Code doesn't match"
+            request.session['submitted_email'] = data['email']
+            request.session['show_code_form'] = True
+            request.session['error'] = "Email is not verified. Code doesn't match"
             return redirect('user:profile', userId = request.user.id)
-            
+        
+@login_required
+def review(request):
+    userCollections = list(UserCollection.objects.filter(userId = request.user.id).values())
+    # return JsonResponse(userCollections, safe=False)
+
+    userCollectionId = [collection['userCollectionId'] for collection in userCollections]
+    # return JsonResponse(userCollectionId, safe=False)
+
+    collectionIds = [collection['collectionId_id'] for collection in userCollections]
+
+    totalTransactionsDetails = Transaction.objects.filter(user_collection__in = userCollectionId)
+    totalTransactionsDetails = TransactionSerializer(totalTransactionsDetails, many=True).data
+
+    return JsonResponse(totalTransactionsDetails, safe=False)
+
+    # Group transactions by collectionId
+    grouped_transactions = defaultdict(list)
+    for transaction in totalTransactionsDetails:
+        collection = transaction["collection"]["collection"]
+        collection_id = collection["collectionId"]
+        grouped_transactions[collection_id].append(transaction)
+
+    totalPLEachColl = {}  #for last json
+    for collectionId in collectionIds:
+        profit = 0
+        loss = 0
+        collectionName = ''
+        for transaction in grouped_transactions.get(collectionId, []):
+            collection = transaction["collection"]["collection"]
+            if transaction["loss"] == 0:
+                profit += transaction["profit"]
+            elif transaction["profit"] == 0:
+                loss += transaction["loss"]
+            collectionName = collection["collectionName"]
+        
+        if collectionName:  # Only add if there are matching transactions
+            totalPLEachColl[collectionName] = {
+                'profit': profit,
+                'loss': loss
+            }
+    return JsonResponse(collectionNameCount, safe=False)
+    return render(request, 'review.html', {
+        "collectionCount": collectionNameCount,
+        "totalProfitAndLose": totalPLEachColl
+    })
+    
+
+    return JsonResponse(totalTransactionsDetails, safe=False)
