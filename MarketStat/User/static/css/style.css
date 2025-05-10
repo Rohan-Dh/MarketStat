@@ -1028,30 +1028,63 @@ body {
 
 /* email verification code form ends*/
 
-/* review page styling starts */
+/* sale analysis styling starts */
 /* Custom Styles */
 .time-filter.active {
-  background: #0dcaf0;
-  color: white !important;
-  border-color: #0dcaf0;
+    background: #0dcaf0;
+    color: white !important;
+    border-color: #0dcaf0;
 }
 
 .progress {
-  height: 25px;
-  border-radius: 12px;
-  overflow: hidden;
+    height: 25px;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .progress-bar {
-  font-weight: 700;
-  letter-spacing: 0.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .card {
-  transition: transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+    transform: translateY(-5px);
 }
-/* review page styling ends */
+
+.combined-content {
+    width: 100%;
+    padding-bottom: 13px;
+    display: flex;
+}
+
+.sale-analysis-quantity-price {
+    width: 50%;
+}
+
+.sale-analysis-profit-loss {
+    width: 50%;
+    right: 0px;
+    padding-left: 60px;
+}
+
+.sale-analysis-profit-loss .profit {
+    color: green;
+    background-color: #033d4b;
+    border: none;
+}
+
+.sale-analysis-profit-loss .loss {
+    color: red;
+    background-color: #033d4b;
+    border: none;
+}
+
+.sale-analysis-background {
+    background-color: #033d4b;
+}
+
+/* sale analysis styling ends */

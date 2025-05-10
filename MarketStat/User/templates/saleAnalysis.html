@@ -7,7 +7,8 @@
       <h4 class="mb-0">Sales Analytics Filter</h4>
     </div>
     <div class="card-body">
-      <form method="GET" class="row g-3">
+      <form method="POST" action="{% url "user:saleAnalysis" %}" class="row g-3">
+        {% csrf_token %}
         <!-- Quick Filters -->
         <div class="col-md-6">
           <div class="btn-group w-100" role="group" aria-label="Basic example">
@@ -41,12 +42,26 @@
   <!-- Most Sold Collections -->
   <h2 class="mb-4">Most Sold Collections</h2>
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    {% for obj in collectionCount %}
+    {% for obj in collection_data %}
     <div class="col">
       <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">{{ obj.collection__name }}</h5>
-          <p class="card-text">Total Sold: {{ obj.total_sold }}</p>
+        <div class="card-body sale-analysis-background">
+          <input type="hidden" name="collectionId" value="{{obj.collectionId}}">
+          <input type="hidden" name="userCollectionId" value="{{obj.userCollectionId}}">
+          <h5 class="card-title">{{ obj.collectionName }}</h5>
+          <div class="combined-content">
+            <div class="sale-analysis-quantity-price">
+              <p class="card-text price-sold">Total Sold: {{ obj.soldPrice }}</p>
+              <p class="card-text quantity-sold">Total Quantity Sold: {{ obj.quantitySold }}</p>
+            </div>
+            <div class="sale-analysis-profit-loss">
+              {% if obj.totalLoss == 0 %}
+              <p class="card-text profit">Total Profit: {{ obj.totalProfit }}</p>
+              {% elif obj.totalProfit == 0%}
+              <p class="card-text loss">Total Loss: {{ obj.totalLoss }}</p>
+              {% endif %}
+            </div>
+          </div>
           <div class="progress">
             <div class="progress-bar bg-info" role="progressbar" 
                  style="width: {{ obj.percentage }}%" 

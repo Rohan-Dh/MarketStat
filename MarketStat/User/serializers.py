@@ -34,7 +34,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = ["transactionId", "quantitySold", "soldPrice", "profit", "loss", "soldTo", "created_at", "updated_at", "collection"]
 
-
 class UserProfileSerializer(serializers.ModelSerializer):
     userId = UserSerializer()
     created_at = serializers.DateTimeField(format="%b %Y")

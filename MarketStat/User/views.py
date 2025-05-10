@@ -343,48 +343,84 @@ def verifyEmail(request):
         
 @login_required
 def saleAnalysis(request):
-    collection_data = Transaction.objects.filter(user_collection__in =[collection['userCollectionId'] for collection in list(UserCollection.objects.filter(userId = request.user.id).values())]).values(
-        'user_collection__collectionId__collectionName'
-    ).annotate(
-        total_sold=Sum('quantitySold'),
-        total_revenue=Sum('soldPrice')
-    ).order_by('-total_sold')
+    if request.method == "POST":
+        time_interval = request.POST.get('time_interval')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
 
-    # Time filtering logic
-    time_interval = request.GET.get('time_interval')
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+        if time_interval:
+            today = timezone.now().date()
+            
+            if time_interval == 'today':
+                start_date = today
+                end_date = today
+            elif time_interval == 'week':
+                start_date = today - timedelta(days=today.weekday())
+                end_date = start_date + timedelta(days=6)
+            elif time_interval == 'month':
+                start_date = today.replace(day=1)
+                end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+            
+            request.session['start_date'] = start_date
+            request.session['end_date'] = end_date
+        
+        elif start_date and end_date:
+            request.session['start_date'] = start_date
+            request.session['end_date'] = end_date
+            
+        print(start_date, end_date)
+        return redirect("user:saleAnalysis")
+    
+    start_date = timezone.now().date()
+    end_date = timezone.now().date()
 
-    if time_interval:
-        today = timezone.now().date()
-        
-        if time_interval == 'today':
-            start_date = today
-            end_date = today
-        elif time_interval == 'week':
-            start_date = today - timedelta(days=today.weekday())
-            end_date = start_date + timedelta(days=6)
-        elif time_interval == 'month':
-            start_date = today.replace(day=1)
-            end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
-        
-        collection_data = collection_data.filter(
+    print(start_date, end_date)
+
+    if 'start_date' and 'end_date' in request.session:
+        start_date = request.session.pop('start_date')
+        end_date = request.session.pop('end_date')
+
+    print(start_date, end_date)
+    
+    collection_data = Transaction.objects.filter(
             created_at__date__range=[start_date, end_date]
         )
-    elif start_date and end_date:
-        collection_data = collection_data.filter(
-            created_at__date__range=[start_date, end_date]
-        )
+
+    userCollectionIds = UserCollection.objects.filter(userId=request.user).values_list('pk', flat=True)
+    collection_data = (collection_data.filter(user_collection__in = userCollectionIds)
+                    .values(
+                        'user_collection_id',
+                        'user_collection__collectionId',
+                        'user_collection__collectionId__collectionName'
+                        )
+                    .annotate(
+                        quantitySold = Sum('quantitySold'),
+                        soldPrice = Sum('soldPrice'),
+                        totalProfit = Sum('profit'),
+                        totalLoss = Sum('loss')
+                        ))
+    collection_data = [
+        {
+            'userCollectionId': entry['user_collection_id'],
+            'collectionId': entry['user_collection__collectionId'],
+            'collectionName': entry['user_collection__collectionId__collectionName'],
+            'quantitySold': entry['quantitySold'],
+            'soldPrice': entry['soldPrice'],
+            'totalProfit': entry['totalProfit'],
+            'totalLoss': entry['totalLoss'],
+        }
+        for entry in collection_data
+    ]
+    collection_data = sorted(collection_data, key=lambda x: x['quantitySold'], reverse=True)
+    # return JsonResponse(collection_data, safe=False)
+
 
     # Calculate percentages
-    total_sold = sum(item['total_sold'] for item in collection_data) or 1
+    soldPrice = sum(item['soldPrice'] for item in collection_data) or 1
     for item in collection_data:
-        item['percentage'] = round((item['total_sold'] / total_sold) * 100, 2)
-
-
+        item['percentage'] = round((item['soldPrice'] / soldPrice) * 100, 2)
+    
     context = {
-        'collectionCount': collection_data,
+        'collection_data': collection_data,
     }
-    print(collection_data)
-
     return render(request, 'saleAnalysis.html', context)
