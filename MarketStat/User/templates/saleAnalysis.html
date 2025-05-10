@@ -1,0 +1,98 @@
+{% include "navbar.html" %}
+{% block content %}
+
+<div class="container mt-5">
+  <div class="card shadow-lg mb-5">
+    <div class="card-header bg-info text-white">
+      <h4 class="mb-0">Sales Analytics Filter</h4>
+    </div>
+    <div class="card-body">
+      <form method="GET" class="row g-3">
+        <!-- Quick Filters -->
+        <div class="col-md-6">
+          <div class="btn-group w-100" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-outline-info time-filter" data-interval="today">Today</button>
+            <button type="button" class="btn btn-outline-info time-filter" data-interval="week">This Week</button>
+            <button type="button" class="btn btn-outline-info time-filter" data-interval="month">This Month</button>
+          </div>
+        </div>
+
+        <!-- Date Range Picker -->
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text bg-info text-white">From</span>
+            <input type="date" class="form-control" name="start_date" id="start_date">
+            <span class="input-group-text bg-info text-white">To</span>
+            <input type="date" class="form-control" name="end_date" id="end_date">
+          </div>
+        </div>
+
+        <input type="hidden" name="time_interval" id="time_interval" value="{{ request.GET.time_interval }}">
+        
+        <div class="col-12">
+          <button type="submit" class="btn btn-info w-100">
+            <i class="bi bi-funnel-fill"></i> Apply Filters
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Most Sold Collections -->
+  <h2 class="mb-4">Most Sold Collections</h2>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for obj in collectionCount %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ obj.collection__name }}</h5>
+          <p class="card-text">Total Sold: {{ obj.total_sold }}</p>
+          <div class="progress">
+            <div class="progress-bar bg-info" role="progressbar" 
+                 style="width: {{ obj.percentage }}%" 
+                 aria-valuenow="{{ obj.percentage }}" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+              {{ obj.percentage }}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Time Filter Buttons
+  document.querySelectorAll('.time-filter').forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active class from all buttons
+      document.querySelectorAll('.time-filter').forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      // Set hidden input value
+      document.getElementById('time_interval').value = this.dataset.interval;
+      
+      // Clear date inputs
+      document.getElementById('start_date').value = '';
+      document.getElementById('end_date').value = '';
+    });
+  });
+
+  // Date Input Handling
+  const dateInputs = document.querySelectorAll('input[type="date"]');
+  dateInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      // Clear time interval when dates are selected
+      document.getElementById('time_interval').value = 'custom';
+      document.querySelectorAll('.time-filter').forEach(btn => btn.classList.remove('active'));
+    });
+  });
+});
+</script>
+
+{% endblock %}

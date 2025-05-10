@@ -1027,3 +1027,31 @@ body {
 }
 
 /* email verification code form ends*/
+
+/* review page styling starts */
+/* Custom Styles */
+.time-filter.active {
+  background: #0dcaf0;
+  color: white !important;
+  border-color: #0dcaf0;
+}
+
+.progress {
+  height: 25px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.card {
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+/* review page styling ends */

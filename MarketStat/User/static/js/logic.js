@@ -167,3 +167,36 @@ window.addEventListener('click', function (event) {
     form.style.display = 'none';
   }
 });
+
+
+
+// review js starts
+// Dark Mode Toggle
+function toggleDarkMode() {
+  document.documentElement.classList.toggle('dark-mode');
+  localStorage.setItem('darkMode', document.documentElement.classList.contains('dark-mode'));
+}
+
+// Initialize dark mode
+if (localStorage.getItem('darkMode') === 'true') {
+  document.documentElement.classList.add('dark-mode');
+}
+
+// Filter Interactions
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    if (this.dataset.interval) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('time_interval').value = this.dataset.interval;
+    }
+  });
+});
+
+// Date Input Handling
+document.querySelectorAll('.date-input').forEach(input => {
+  input.addEventListener('change', function () {
+    document.getElementById('time_interval').value = 'custom';
+  });
+});
+// review js ends

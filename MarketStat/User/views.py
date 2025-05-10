@@ -3,6 +3,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.views import LoginView
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import timedelta
 from django.http import HttpResponse, JsonResponse
 from django.contrib import auth
 from collections import Counter, defaultdict
@@ -335,52 +338,53 @@ def verifyEmail(request):
             request.session['show_code_form'] = True
             request.session['error'] = "Email is not verified. Code doesn't match"
             return redirect('user:profile', userId = request.user.id)
+
+
         
 @login_required
-def review(request):
-    userCollections = list(UserCollection.objects.filter(userId = request.user.id).values())
-    # return JsonResponse(userCollections, safe=False)
+def saleAnalysis(request):
+    collection_data = Transaction.objects.filter(user_collection__in =[collection['userCollectionId'] for collection in list(UserCollection.objects.filter(userId = request.user.id).values())]).values(
+        'user_collection__collectionId__collectionName'
+    ).annotate(
+        total_sold=Sum('quantitySold'),
+        total_revenue=Sum('soldPrice')
+    ).order_by('-total_sold')
 
-    userCollectionId = [collection['userCollectionId'] for collection in userCollections]
-    # return JsonResponse(userCollectionId, safe=False)
+    # Time filtering logic
+    time_interval = request.GET.get('time_interval')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
-    collectionIds = [collection['collectionId_id'] for collection in userCollections]
-
-    totalTransactionsDetails = Transaction.objects.filter(user_collection__in = userCollectionId)
-    totalTransactionsDetails = TransactionSerializer(totalTransactionsDetails, many=True).data
-
-    return JsonResponse(totalTransactionsDetails, safe=False)
-
-    # Group transactions by collectionId
-    grouped_transactions = defaultdict(list)
-    for transaction in totalTransactionsDetails:
-        collection = transaction["collection"]["collection"]
-        collection_id = collection["collectionId"]
-        grouped_transactions[collection_id].append(transaction)
-
-    totalPLEachColl = {}  #for last json
-    for collectionId in collectionIds:
-        profit = 0
-        loss = 0
-        collectionName = ''
-        for transaction in grouped_transactions.get(collectionId, []):
-            collection = transaction["collection"]["collection"]
-            if transaction["loss"] == 0:
-                profit += transaction["profit"]
-            elif transaction["profit"] == 0:
-                loss += transaction["loss"]
-            collectionName = collection["collectionName"]
+    if time_interval:
+        today = timezone.now().date()
         
-        if collectionName:  # Only add if there are matching transactions
-            totalPLEachColl[collectionName] = {
-                'profit': profit,
-                'loss': loss
-            }
-    return JsonResponse(collectionNameCount, safe=False)
-    return render(request, 'review.html', {
-        "collectionCount": collectionNameCount,
-        "totalProfitAndLose": totalPLEachColl
-    })
-    
+        if time_interval == 'today':
+            start_date = today
+            end_date = today
+        elif time_interval == 'week':
+            start_date = today - timedelta(days=today.weekday())
+            end_date = start_date + timedelta(days=6)
+        elif time_interval == 'month':
+            start_date = today.replace(day=1)
+            end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+        
+        collection_data = collection_data.filter(
+            created_at__date__range=[start_date, end_date]
+        )
+    elif start_date and end_date:
+        collection_data = collection_data.filter(
+            created_at__date__range=[start_date, end_date]
+        )
 
-    return JsonResponse(totalTransactionsDetails, safe=False)
+    # Calculate percentages
+    total_sold = sum(item['total_sold'] for item in collection_data) or 1
+    for item in collection_data:
+        item['percentage'] = round((item['total_sold'] / total_sold) * 100, 2)
+
+
+    context = {
+        'collectionCount': collection_data,
+    }
+    print(collection_data)
+
+    return render(request, 'saleAnalysis.html', context)
