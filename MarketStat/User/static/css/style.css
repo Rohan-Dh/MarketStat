@@ -1087,4 +1087,14 @@ body {
     background-color: #033d4b;
 }
 
+.card-body a {
+    text-decoration: none;
+}
+
+.context-title {
+    color: #839496;
+    margin-bottom: 0px;
+    padding-bottom: 4px;
+}
+
 /* sale analysis styling ends */

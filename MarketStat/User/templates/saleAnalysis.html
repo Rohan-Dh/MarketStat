@@ -46,22 +46,26 @@
     <div class="col">
       <div class="card h-100 shadow-sm">
         <div class="card-body sale-analysis-background">
-          <input type="hidden" name="collectionId" value="{{obj.collectionId}}">
-          <input type="hidden" name="userCollectionId" value="{{obj.userCollectionId}}">
-          <h5 class="card-title">{{ obj.collectionName }}</h5>
-          <div class="combined-content">
-            <div class="sale-analysis-quantity-price">
-              <p class="card-text price-sold">Total Sold: {{ obj.soldPrice }}</p>
-              <p class="card-text quantity-sold">Total Quantity Sold: {{ obj.quantitySold }}</p>
-            </div>
-            <div class="sale-analysis-profit-loss">
-              {% if obj.totalLoss == 0 %}
-              <p class="card-text profit">Total Profit: {{ obj.totalProfit }}</p>
-              {% elif obj.totalProfit == 0%}
-              <p class="card-text loss">Total Loss: {{ obj.totalLoss }}</p>
-              {% endif %}
-            </div>
-          </div>
+          <a href="javascript:void(0)" onclick="this.closest('form').submit();">
+          <h5 class="context-title">{{ obj.collectionName }}</h5>
+          <form action="{% url 'user:displayGraph' %}" method="POST" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="collectionId" value="{{ obj.collectionId }}">
+            <input type="hidden" name="userCollectionId" value="{{ obj.userCollectionId }}">
+              <div class="combined-content">
+                <div class="sale-analysis-quantity-price">
+                  <p class="card-text price-sold">Total Sold: {{ obj.soldPrice }}</p>
+                  <p class="card-text quantity-sold">Total Quantity Sold: {{ obj.quantitySold }}</p>
+                </div>
+                <div class="sale-analysis-profit-loss">
+                  {% if obj.totalLoss == 0 %}
+                  <p class="card-text profit">Total Profit: {{ obj.totalProfit }}</p>
+                  {% elif obj.totalProfit == 0%}
+                  <p class="card-text loss">Total Loss: {{ obj.totalLoss }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </a>
           <div class="progress">
             <div class="progress-bar bg-info" role="progressbar" 
                  style="width: {{ obj.percentage }}%" 

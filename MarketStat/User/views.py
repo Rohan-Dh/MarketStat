@@ -8,7 +8,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.http import HttpResponse, JsonResponse
 from django.contrib import auth
-from collections import Counter, defaultdict
+from datetime import datetime
 from .serializers import *
 from .models import *
 from .forms import *
@@ -361,26 +361,21 @@ def saleAnalysis(request):
                 start_date = today.replace(day=1)
                 end_date = (start_date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
             
-            request.session['start_date'] = start_date
-            request.session['end_date'] = end_date
+            request.session['start_date'] = str(start_date)
+            request.session['end_date'] = str(end_date)
         
         elif start_date and end_date:
-            request.session['start_date'] = start_date
-            request.session['end_date'] = end_date
-            
-        print(start_date, end_date)
+            request.session['start_date'] = str(start_date)
+            request.session['end_date'] = str(end_date)
+
         return redirect("user:saleAnalysis")
     
     start_date = timezone.now().date()
     end_date = timezone.now().date()
 
-    print(start_date, end_date)
-
-    if 'start_date' and 'end_date' in request.session:
-        start_date = request.session.pop('start_date')
-        end_date = request.session.pop('end_date')
-
-    print(start_date, end_date)
+    if 'start_date' in request.session and 'end_date' in request.session:
+        start_date = datetime.strptime(request.session.pop('start_date'), "%Y-%m-%d").date()
+        end_date = datetime.strptime(request.session.pop('end_date'), "%Y-%m-%d").date()
     
     collection_data = Transaction.objects.filter(
             created_at__date__range=[start_date, end_date]
@@ -424,3 +419,8 @@ def saleAnalysis(request):
         'collection_data': collection_data,
     }
     return render(request, 'saleAnalysis.html', context)
+
+
+@login_required
+def displayGraph(request):
+    return HttpResponse("hello")

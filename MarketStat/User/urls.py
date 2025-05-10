@@ -19,4 +19,5 @@ urlpatterns = [
     path('profile/change-profile/', changeProfile, name='changeProfile'),
     path('verifyEmail/', verifyEmail, name='verifyEmail'),
     path('sale-analysis/', saleAnalysis, name='saleAnalysis'),
+    path('display-graph/', displayGraph, name='displayGraph'),
 ]
