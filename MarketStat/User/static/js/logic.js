@@ -243,11 +243,13 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
 
       const form = this.closest('form');
+      const start_date = this.dataset.start_date;
+      const end_date = this.dataset.end_date;
       const collectionId = this.dataset.collectionId;
       const userCollectionId = this.dataset.userCollectionId;
 
       try {
-        const response = await fetch(`${form.action}?collectionId=${collectionId}&userCollectionId=${userCollectionId}`, {
+        const response = await fetch(`${form.action}?collectionId=${collectionId}&userCollectionId=${userCollectionId}&start_date=${start_date}&end_date=${end_date}`, {
           headers: {
             'X-Requested-With': 'XMLHttpRequest', // This is crucial
             'Accept': 'application/json'

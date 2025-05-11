@@ -51,13 +51,14 @@
       <div class="card h-100 shadow-sm">
         <div class="card-body sale-analysis-background">
           <form action="{% url 'user:displayGraph' %}" method="GET" class="graph-form" onsubmit="return false;">
-            <a href="#" class="show-graph-link text-decoration-none" data-collection-id="{{ obj.collectionId }}" data-user-collection-id="{{ obj.userCollectionId }}">
+            <a href="#" class="show-graph-link text-decoration-none" data-collection-id="{{ obj.collectionId }}" data-user-collection-id="{{ obj.userCollectionId }}" data-start_date="{{start_date}}" data-end_date="{{end_date}}">
               <h5 class="context-title">{{ obj.collectionName }}</h5>
               <input type="hidden" name="collectionId" value="{{ obj.collectionId }}">
               <input type="hidden" name="userCollectionId" value="{{ obj.userCollectionId }}">
+              <input type="hidden" name="start_date" value="{{ start_date }}">
+              <input type="hidden" name="end_date" value="{{ end_date }}">
               <div class="combined-content">
-                <div class="sale-analysis-quantity-price">
-                  <p class="card-text price-sold">Total Sold: {{ obj.soldPrice }}</p>
+                <div class="sale-analysis-quantity">
                   <p class="card-text quantity-sold">Total Quantity Sold: {{ obj.quantitySold }}</p>
                 </div>
                 <div class="sale-analysis-profit-loss">
@@ -70,7 +71,7 @@
               </div>
             </a>
           </form>
-          <div class="progress">
+          {% comment %} <div class="progress">
             <div class="progress-bar bg-info" role="progressbar" 
                  style="width: {{ obj.percentage }}%" 
                  aria-valuenow="{{ obj.percentage }}" 
@@ -78,7 +79,7 @@
                  aria-valuemax="100">
               {{ obj.percentage }}%
             </div>
-          </div>
+          </div> {% endcomment %}
         </div>
       </div>
     </div>

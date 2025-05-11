@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.views import LoginView
-from django.db.models import Sum
+from django.db.models import Sum, Count, functions
 from django.utils import timezone
 from datetime import timedelta
 from django.http import HttpResponse, JsonResponse
@@ -300,6 +300,9 @@ def profileView(request, userId=None):
         return redirect('user:profile', userId=userId)
     
     form = UserProfileForm()
+    success = None
+    if 'success' in request.session:
+        success = request.session.pop('success')
     show_code_form = request.session.pop('show_code_form', False)
     email = request.session.pop('submitted_email', profile.userId.email)
 
@@ -309,6 +312,7 @@ def profileView(request, userId=None):
         'show_code_form': show_code_form,
         'email': email,
         'error': error,
+        'success': success,
     })
 
 
@@ -390,7 +394,6 @@ def saleAnalysis(request):
                         )
                     .annotate(
                         quantitySold = Sum('quantitySold'),
-                        soldPrice = Sum('soldPrice'),
                         totalProfit = Sum('profit'),
                         totalLoss = Sum('loss')
                         ))
@@ -400,25 +403,18 @@ def saleAnalysis(request):
             'collectionId': entry['user_collection__collectionId'],
             'collectionName': entry['user_collection__collectionId__collectionName'],
             'quantitySold': entry['quantitySold'],
-            'soldPrice': entry['soldPrice'],
             'totalProfit': entry['totalProfit'],
             'totalLoss': entry['totalLoss'],
         }
         for entry in collection_data
     ]
     collection_data = sorted(collection_data, key=lambda x: x['quantitySold'], reverse=True)
-    # return JsonResponse(collection_data, safe=False)
-
-
-    # Calculate percentages
-    soldPrice = sum(item['soldPrice'] for item in collection_data) or 1
-    for item in collection_data:
-        item['percentage'] = round((item['soldPrice'] / soldPrice) * 100, 2)
 
     # return JsonResponse(collection_data, safe=False)
-    
     context = {
         'collection_data': collection_data,
+        'start_date': start_date,
+        'end_date': end_date
     }
     return render(request, 'saleAnalysis.html', context)
 
@@ -427,11 +423,106 @@ def saleAnalysis(request):
 @login_required
 def displayGraph(request):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        dayWeekMonthYear = "year"
         collectionId = request.GET.get('collectionId')
         userCollectionId = request.GET.get('userCollectionId')
-        return JsonResponse({
-            "labels": ["Jan", "Feb", "Mar", "Apr", "May", "june"], 
-            "quantities": [10, 20, 30],
-            "prices": [100, 200, 300]
-        })
+        start_date = datetime.strptime(request.GET.get('start_date'), "%B %d, %Y")
+        end_date = datetime.strptime(request.GET.get('end_date'), "%B %d, %Y")
+        diff_days = abs((end_date-start_date).days)
+        start_date = start_date.strftime("%Y-%m-%d")
+        end_date = end_date.strftime("%Y-%m-%d")
+
+        transactionObj = Transaction.objects.filter(
+            created_at__date__range=[start_date, end_date], user_collection__userCollectionId = userCollectionId)
+
+        if diff_days == 0:
+            group_by = 'hour'
+            transactionObj = (transactionObj.annotate(hour=functions.ExtractHour('created_at')) \
+                .values('hour') \
+                .annotate(
+                    quantitySold=Sum('quantitySold'),
+                    soldPrice=Sum('soldPrice'),
+                    transactionCount=Count('transactionId')
+                ).order_by('hour'))
+        elif diff_days < 7:
+            group_by = "day"
+            transactionObj = (transactionObj.annotate(day=functions.ExtractWeekDay('created_at')) \
+                .values('day') \
+                .annotate(
+                    quantitySold=Sum('quantitySold'),
+                    soldPrice=Sum('soldPrice'),
+                    transactionCount=Count('transactionId')
+                ).order_by('day'))
+        elif diff_days < 30:
+            group_by = 'week'
+            transactionObj = (transactionObj.annotate(week=functions.ExtractWeek('created_at')) \
+                .values('week') \
+                .annotate(
+                    quantitySold=Sum('quantitySold'),
+                    soldPrice=Sum('soldPrice'),
+                    transactionCount=Count('transactionId')
+                ).order_by('week'))
+        elif diff_days < 365:
+            group_by = 'month'
+            transactionObj = (transactionObj.annotate(month=functions.ExtractMonth('created_at')) \
+                .values('month') \
+                .annotate(
+                    quantitySold=Sum('quantitySold'),
+                    soldPrice=Sum('soldPrice'),
+                    transactionCount=Count('transactionId')
+                ).order_by('month'))
+        else:
+            group_by = 'year'
+            transactionObj = (transactionObj.annotate(year=functions.ExtractYear('created_at')) \
+                .values('year') \
+                .annotate(
+                    quantitySold=Sum('quantitySold'),
+                    soldPrice=Sum('soldPrice'),
+                    transactionCount=Count('transactionId')
+                ).order_by('year'))
+        
+        result = {
+            "labels": [],
+            "quantities": [],
+            "prices": [],
+        }
+
+        if "hour" in transactionObj[0]:
+            result['labels'].extend(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'])
+            result['prices'] = [0] * 24
+            result['quantities'] = [0] * 24
+        if "day" in transactionObj[0]:
+            result['labels'].extend(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
+            result['prices'] = [0] * 7
+            result['quantities'] = [0] * 7
+        if "week" in transactionObj[0]:
+            result['labels'].extend(['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'])
+            result['prices'] = [0] * 6
+            result['quantities'] = [0] * 6
+        if "month" in transactionObj[0]:
+            result['labels'].extend(['Jan', 'Feb', 'March', 'April', 'May', 'June', 'july', 'August', 'Sep', 'Oct', 'Nov', 'Dec'])
+            result['prices'] = [0] * 12
+            result['quantities'] = [0] * 12
+        print(result)
+        for entry in transactionObj:
+            if "hour" in transactionObj[0]:
+                print(entry['hour'])
+                result['quantities'][entry['hour']-1] = entry['quantitySold']  
+                result['prices'][entry['hour']-1] = entry['soldPrice']
+            if "day" in transactionObj[0]:
+                print(entry['day'])
+                result['quantities'][entry['day']-1] = entry['quantitySold']  
+                result['prices'][entry['day']-1] = entry['soldPrice']
+            if "week" in transactionObj[0]:
+                result['quantities'][entry['week']-1] = entry['quantitySold']  
+                result['prices'][entry['week']-1] = entry['soldPrice']
+            if "month" in transactionObj[0]:
+                result['quantities'][entry['month']-1] = entry['quantitySold']  
+                result['prices'][entry['month']-1] = entry['soldPrice']
+            if "year" in transactionObj[0]:
+                result['quantities'][entry['year']-1] = entry['quantitySold']  
+                result['prices'][entry['year']-1] = entry['soldPrice']
+
+        print(result)
+        return JsonResponse(result)
     return JsonResponse({})
