@@ -200,3 +200,128 @@ document.querySelectorAll('.date-input').forEach(input => {
   });
 });
 // review js ends
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Time filtering code handling
+  // Time Filter Buttons
+  document.querySelectorAll('.time-filter').forEach(button => {
+    button.addEventListener('click', function () {
+      // Remove active class from all buttons
+      document.querySelectorAll('.time-filter').forEach(btn => btn.classList.remove('active'));
+
+      // Add active class to clicked button
+      this.classList.add('active');
+
+      // Set hidden input value
+      document.getElementById('time_interval').value = this.dataset.interval;
+
+      // Clear date inputs
+      document.getElementById('start_date').value = '';
+      document.getElementById('end_date').value = '';
+    });
+  });
+  // Date Input Handling
+  const dateInputs = document.querySelectorAll('input[type="date"]');
+  dateInputs.forEach(input => {
+    input.addEventListener('change', function () {
+      // Clear time interval when dates are selected
+      document.getElementById('time_interval').value = 'custom';
+      document.querySelectorAll('.time-filter').forEach(btn => btn.classList.remove('active'));
+    });
+  });
+
+
+
+  // chart handling code
+  let salesChart = null;
+  // Graph display handler
+  document.querySelectorAll('.show-graph-link').forEach(link => {
+    link.addEventListener('click', async function (e) {
+      e.preventDefault();
+
+      const form = this.closest('form');
+      const collectionId = this.dataset.collectionId;
+      const userCollectionId = this.dataset.userCollectionId;
+
+      try {
+        const response = await fetch(`${form.action}?collectionId=${collectionId}&userCollectionId=${userCollectionId}`, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest', // This is crucial
+            'Accept': 'application/json'
+          }
+        });
+        console.log(response);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+        console.log(data.quantities);
+
+        if (salesChart) salesChart.destroy();
+
+        const ctx = document.getElementById('salesChart').getContext('2d');
+
+        salesChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Quantity Sold',
+              data: data.quantities,
+              backgroundColor: '#02aab0',
+              borderColor: '#00ffff',
+              borderWidth: 1,
+              borderRadius: 4,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: '#fff',
+                formatter: (value, context) => {
+                  return data.prices[context.dataIndex];
+                }
+              },
+              legend: {
+                labels: { color: '#fff' }
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  text: 'Time Period',
+                  display: true,
+                  color: '#fff'
+                },
+                grid: { color: '#004756' },
+                ticks: { color: '#fff' }
+              },
+              y: {
+                title: {
+                  text: 'Quantity Sold',
+                  display: true,
+                  color: '#fff'
+                },
+                grid: { color: '#004756' },
+                ticks: { color: '#fff' }
+              }
+            }
+          },
+          plugins: [ChartDataLabels]
+        });
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('graphModal'));
+        modal.show();
+      } catch (error) {
+        console.error('Error loading graph data:', error);
+      }
+    });
+  });
+});

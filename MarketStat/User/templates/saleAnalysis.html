@@ -46,12 +46,11 @@
     <div class="col">
       <div class="card h-100 shadow-sm">
         <div class="card-body sale-analysis-background">
-          <a href="javascript:void(0)" onclick="this.closest('form').submit();">
-          <h5 class="context-title">{{ obj.collectionName }}</h5>
-          <form action="{% url 'user:displayGraph' %}" method="POST" style="display: inline;">
-            {% csrf_token %}
-            <input type="hidden" name="collectionId" value="{{ obj.collectionId }}">
-            <input type="hidden" name="userCollectionId" value="{{ obj.userCollectionId }}">
+          <form action="{% url 'user:displayGraph' %}" method="GET" class="graph-form" onsubmit="return false;">
+            <a href="#" class="show-graph-link text-decoration-none" data-collection-id="{{ obj.collectionId }}" data-user-collection-id="{{ obj.userCollectionId }}">
+              <h5 class="context-title">{{ obj.collectionName }}</h5>
+              <input type="hidden" name="collectionId" value="{{ obj.collectionId }}">
+              <input type="hidden" name="userCollectionId" value="{{ obj.userCollectionId }}">
               <div class="combined-content">
                 <div class="sale-analysis-quantity-price">
                   <p class="card-text price-sold">Total Sold: {{ obj.soldPrice }}</p>
@@ -66,6 +65,7 @@
                 </div>
               </div>
             </a>
+          </form>
           <div class="progress">
             <div class="progress-bar bg-info" role="progressbar" 
                  style="width: {{ obj.percentage }}%" 
@@ -82,36 +82,19 @@
   </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Time Filter Buttons
-  document.querySelectorAll('.time-filter').forEach(button => {
-    button.addEventListener('click', function() {
-      // Remove active class from all buttons
-      document.querySelectorAll('.time-filter').forEach(btn => btn.classList.remove('active'));
-      
-      // Add active class to clicked button
-      this.classList.add('active');
-      
-      // Set hidden input value
-      document.getElementById('time_interval').value = this.dataset.interval;
-      
-      // Clear date inputs
-      document.getElementById('start_date').value = '';
-      document.getElementById('end_date').value = '';
-    });
-  });
-
-  // Date Input Handling
-  const dateInputs = document.querySelectorAll('input[type="date"]');
-  dateInputs.forEach(input => {
-    input.addEventListener('change', function() {
-      // Clear time interval when dates are selected
-      document.getElementById('time_interval').value = 'custom';
-      document.querySelectorAll('.time-filter').forEach(btn => btn.classList.remove('active'));
-    });
-  });
-});
-</script>
-
+<div class="modal fade" id="graphModal" tabindex="-1" aria-labelledby="graphModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content" style="background-color: #002b36;">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-light" id="graphModalLabel">Sales Analytics</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="chart-container" style="position: relative; height: 60vh; width: 100%">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

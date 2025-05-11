@@ -414,6 +414,8 @@ def saleAnalysis(request):
     soldPrice = sum(item['soldPrice'] for item in collection_data) or 1
     for item in collection_data:
         item['percentage'] = round((item['soldPrice'] / soldPrice) * 100, 2)
+
+    # return JsonResponse(collection_data, safe=False)
     
     context = {
         'collection_data': collection_data,
@@ -421,6 +423,15 @@ def saleAnalysis(request):
     return render(request, 'saleAnalysis.html', context)
 
 
+
 @login_required
 def displayGraph(request):
-    return HttpResponse("hello")
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        collectionId = request.GET.get('collectionId')
+        userCollectionId = request.GET.get('userCollectionId')
+        return JsonResponse({
+            "labels": ["Jan", "Feb", "Mar", "Apr", "May", "june"], 
+            "quantities": [10, 20, 30],
+            "prices": [100, 200, 300]
+        })
+    return JsonResponse({})

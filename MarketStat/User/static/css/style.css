@@ -1097,4 +1097,22 @@ body {
     padding-bottom: 4px;
 }
 
+/* bar-graph styling starts */
+.chart-container {
+    background-color: #003847;
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .chartjs-render-monitor {
+    animation: none !important;
+  }
+
+  .chart-tooltip {
+    background: #02aab0 !important;
+    border-color: #02aab0 !important;
+    color: #fff !important;
+  }
+/* bar-graph styling ends */
+
 /* sale analysis styling ends */
