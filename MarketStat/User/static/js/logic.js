@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: {
                   text: 'Quantity Sold',
                   display: true,
-                  color: '#fff'
+                  color: '#fff',
                 },
                 grid: { color: '#004756' },
                 ticks: { color: '#fff' }

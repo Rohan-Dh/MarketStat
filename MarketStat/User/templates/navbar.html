@@ -19,10 +19,10 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'notification' %} active {% endif %}" href="{% url "user:notification"%}">Notifications</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link profile {% if request.resolver_match.url_name == 'profile' %} active {% endif %}" href="{% url "user:profile" request.user.id %}">Profile</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'saleAnalysis' %} active {% endif %}" href="{% url "user:saleAnalysis"%}">Sale Analysis</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'saleAnalysis' %} active {% endif %}" href="{% url "user:saleAnalysis"%}">Sale Analysis</a>
+                    <a class="nav-link profile {% if request.resolver_match.url_name == 'profile' %} active {% endif %}" href="{% url "user:profile" request.user.id %}">Profile</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'logout' %} active {% endif %}" href="{% url "user:logout"%}">Logout</a>
