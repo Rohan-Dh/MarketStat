@@ -424,8 +424,8 @@ def saleAnalysis(request):
 @login_required
 def displayGraph(request):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        dayWeekMonthYear = "year"
-        collectionId = request.GET.get('collectionId')
+        # dayWeekMonthYear = "year"
+        # collectionId = request.GET.get('collectionId')
         userCollectionId = request.GET.get('userCollectionId')
         start_date = datetime.strptime(request.GET.get('start_date'), "%B %d, %Y")
         end_date = datetime.strptime(request.GET.get('end_date'), "%B %d, %Y")
@@ -435,9 +435,10 @@ def displayGraph(request):
 
         transactionObj = Transaction.objects.filter(
             created_at__date__range=[start_date, end_date], user_collection__userCollectionId = userCollectionId)
-
+        
+        print(diff_days)
         if diff_days == 0:
-            group_by = 'hour'
+            # group_by = 'hour'
             transactionObj = (transactionObj.annotate(hour=functions.ExtractHour('created_at')) \
                 .values('hour') \
                 .annotate(
@@ -446,7 +447,7 @@ def displayGraph(request):
                     transactionCount=Count('transactionId')
                 ).order_by('hour'))
         elif diff_days < 7:
-            group_by = "day"
+            # group_by = "day"
             transactionObj = (transactionObj.annotate(day=functions.ExtractWeekDay('created_at')) \
                 .values('day') \
                 .annotate(
@@ -455,7 +456,7 @@ def displayGraph(request):
                     transactionCount=Count('transactionId')
                 ).order_by('day'))
         elif diff_days < 30:
-            group_by = 'week'
+            # group_by = 'week'
             transactionObj = (transactionObj.annotate(week=functions.ExtractWeek('created_at')) \
                 .values('week') \
                 .annotate(
@@ -464,7 +465,7 @@ def displayGraph(request):
                     transactionCount=Count('transactionId')
                 ).order_by('week'))
         elif diff_days < 365:
-            group_by = 'month'
+            # group_by = 'month'
             transactionObj = (transactionObj.annotate(month=functions.ExtractMonth('created_at')) \
                 .values('month') \
                 .annotate(
@@ -473,7 +474,7 @@ def displayGraph(request):
                     transactionCount=Count('transactionId')
                 ).order_by('month'))
         else:
-            group_by = 'year'
+            # group_by = 'year'
             transactionObj = (transactionObj.annotate(year=functions.ExtractYear('created_at')) \
                 .values('year') \
                 .annotate(
@@ -507,11 +508,9 @@ def displayGraph(request):
 
         for entry in transactionObj:
             if "hour" in transactionObj[0]:
-                print(entry['hour'])
                 result['quantities'][entry['hour']-1] = entry['quantitySold']  
                 result['prices'][entry['hour']-1] = entry['soldPrice']
             if "day" in transactionObj[0]:
-                print(entry['day'])
                 result['quantities'][entry['day']-1] = entry['quantitySold']  
                 result['prices'][entry['day']-1] = entry['soldPrice']
             if "week" in transactionObj[0]:

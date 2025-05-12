@@ -62,11 +62,8 @@
                   <p class="card-text quantity-sold">Total Quantity Sold: {{ obj.quantitySold }}</p>
                 </div>
                 <div class="sale-analysis-profit-loss">
-                  {% if obj.totalLoss == 0 %}
                   <p class="card-text profit">Total Profit: {{ obj.totalProfit }}</p>
-                  {% elif obj.totalProfit == 0%}
                   <p class="card-text loss">Total Loss: {{ obj.totalLoss }}</p>
-                  {% endif %}
                 </div>
               </div>
             </a>
