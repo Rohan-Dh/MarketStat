@@ -130,7 +130,6 @@ def updateCollection(request, userCollectionId):
 
         quantitySame = collectionObject.quantity == form.cleaned_data['changedQuantity']
         priceSame = collectionObject.initialPrice == form.cleaned_data['changedPrice']
-        print(collectionObject.collectionId == newCollection)
         collectionSame = collectionObject.collectionId == newCollection
 
         # All 3 changed
@@ -410,6 +409,8 @@ def saleAnalysis(request):
     ]
     collection_data = sorted(collection_data, key=lambda x: x['quantitySold'], reverse=True)
 
+    print(collection_data)
+
     # return JsonResponse(collection_data, safe=False)
     context = {
         'collection_data': collection_data,
@@ -503,7 +504,7 @@ def displayGraph(request):
             result['labels'].extend(['Jan', 'Feb', 'March', 'April', 'May', 'June', 'july', 'August', 'Sep', 'Oct', 'Nov', 'Dec'])
             result['prices'] = [0] * 12
             result['quantities'] = [0] * 12
-        print(result)
+
         for entry in transactionObj:
             if "hour" in transactionObj[0]:
                 print(entry['hour'])
@@ -522,7 +523,5 @@ def displayGraph(request):
             if "year" in transactionObj[0]:
                 result['quantities'][entry['year']-1] = entry['quantitySold']  
                 result['prices'][entry['year']-1] = entry['soldPrice']
-
-        print(result)
         return JsonResponse(result)
     return JsonResponse({})
