@@ -4,7 +4,6 @@ from .views import *
 app_name = "user"
 
 urlpatterns = [
-    # path("", userLogin, name="userLogin"),
     path('home/', home, name="home"),
     path("", CustomLoginView.as_view(), name='login'),
     path("accounts/", include("django.contrib.auth.urls")),

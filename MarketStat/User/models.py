@@ -22,7 +22,7 @@ class Collection(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.collectionId)
+        return self.collectionName
     
 class UserCollection(models.Model):
     userCollectionId = models.AutoField(primary_key=True)

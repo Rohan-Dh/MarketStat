@@ -28,12 +28,15 @@
                                 </div>
                             </div>
                             <div class="status-indicators">
+                                {% if transaction.profit %}
                                 <div class="indicator profit {% if not transaction.profit %}neutral{% endif %}">
-                                    Profit: ₹{{ transaction.profit|default:"-" }}
+                                    Profit: ₹{{ transaction.profit }}
                                 </div>
+                                {%else%}
                                 <div class="indicator loss {% if not transaction.loss %}neutral{% endif %}">
-                                    Loss: ₹{{ transaction.loss|default:"-" }}
+                                    Loss: ₹{{ transaction.loss }}
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
